@@ -75,6 +75,7 @@
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 22px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .nav .model .button .dropdown {
@@ -112,6 +113,7 @@
 
 .page .main .container .nav .model .button .dropdown .item .checked span {
   font-size: 20px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .nav .model .button .dropdown .item .unchecked {
@@ -123,6 +125,7 @@
 
 .page .main .container .nav .model .button .dropdown .item .unchecked span {
   font-size: 20px;
+  font-variation-settings: 'FILL' 0, 'wght' 900, 'GRAD' 0, 'opsz' 24;
 }
 
 .page .main .container .nav .model .button .dropdown .item .text {
@@ -171,6 +174,7 @@
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 19px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .nav .menu .user {
@@ -189,6 +193,7 @@
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 22px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .content {
@@ -236,11 +241,12 @@
 
 .page .main .container .content .base .left .menu .popular span {
   position: absolute;
-  top: 48%;
+  top: 47%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 20px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .content .base .left .menu .history {
@@ -254,11 +260,12 @@
 
 .page .main .container .content .base .left .menu .history span {
   position: absolute;
-  top: 50%;
+  top: 50.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 20px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .content .base .left .menu .saved {
@@ -277,6 +284,7 @@
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 21px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .content .base .left .tabs {
@@ -409,7 +417,7 @@
   image-rendering: pixelated;
   display: flex;
   transition: opacity 0.5s ease;
-  object-fit: contain; /* Убедитесь, что изображение вписывается в контейнер */
+  object-fit: contain;
 }
 
 .page .main .container .content .base .center .picture .loader {
@@ -473,6 +481,7 @@
 .page .main .container .content .base .center .prompt .enter {
   width: 26px;
   height: 26px;
+  aspect-ratio: 1 / 1;
   position: relative;
   background-color: #3586FF;
   border-radius: 4px;
@@ -484,14 +493,39 @@
 
 .page .main .container .content .base .center .prompt .enter span {
   position: absolute;
-  top: 50%;
+  top: 49%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 20px;
+  font-variation-settings: 'FILL' 1;
+}
+
+.page .main .container .content .base .center .prompt .random {
+  width: 26px;
+  height: 26px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  background-color: #3586FF;
+  border-radius: 4px;
+  margin-left: 10px;
+  display: flex;
+  align-self: flex-end;
+  cursor: pointer;
+}
+
+.page .main .container .content .base .center .prompt .random span {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 20px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .content .base .right {
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -523,6 +557,7 @@
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 22px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .content .base .right .edit {
@@ -541,6 +576,7 @@
   transform: translate(-50%, -50%);
   color: #fff;
   font-size: 20px;
+  font-variation-settings: 'FILL' 1;
 }
 
 .page .main .container .content .base .right .menu .active {
@@ -548,12 +584,15 @@
 }
 
 .page .main .container .content .base .right .alternate {
+  width: 15vh;
   display: inline-flex;
   flex-direction: column;
   row-gap: 15px;
 }
 
 .page .main .container .content .base .right .alternate .picture {
+  max-width: 100%;
+  max-height: 100%;
   background-color: #171E46;
   position: relative;
   aspect-ratio: 1 / 1;
@@ -563,21 +602,23 @@
 }
 
 .page .main .container .content .base .right .alternate .picture img {
+  width: 100%;
+  height: 100%;
   position: relative;
-  aspect-ratio: 1 / 1;
   border-radius: 4px;
   image-rendering: pixelated;
+  object-fit: contain;
   display: flex;
   cursor: pointer;
   z-index: 1;
 }
 
-.page .main .container .content  .additional {
+.page .main .container .content .additional {
   position: relative;
   margin-left: 5%;
 }
 
-.page .main .container .content  .additional .title {
+.page .main .container .content .additional .title {
   color: #fff;
   font-family: 'Mate';
   font-size: 16px;
@@ -587,7 +628,7 @@
   text-align: center;
 }
 
-.page .main .container .content  .additional .options {
+.page .main .container .content .additional .options {
   background-color: #13182E;
   border-radius: 6px;
   padding-top: 14px;
@@ -598,7 +639,7 @@
   flex-direction: column;
 }
 
-.page .main .container .content  .additional .options .label {
+.page .main .container .content .additional .options .label {
   color: rgba(255, 255, 255, 0.6);
   font-family: 'Mate';
   font-size: 14px;
@@ -608,7 +649,7 @@
   text-wrap: nowrap;
 }
 
-.page .main .container .content  .additional .options input[type="range"] {
+.page .main .container .content .additional .options input[type="range"] {
   min-width: 240px;
   height: 6px;
   background-color: rgba(53, 134, 255, 0.2);
@@ -620,7 +661,7 @@
   cursor: pointer;
 }
 
-.page .main .container .content  .additional .options input[type="range"]::-webkit-slider-thumb {
+.page .main .container .content .additional .options input[type="range"]::-webkit-slider-thumb {
   width: 6px;
   -webkit-appearance: none;
   height: 12px;
@@ -628,7 +669,7 @@
   border-radius: 2px;
 }
 
-.page .main .container .content  .additional .options .type {
+.page .main .container .content .additional .options .type {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
@@ -637,7 +678,7 @@
   margin-bottom: 15px;
 }
 
-.page .main .container .content  .additional .options .type .tab {
+.page .main .container .content .additional .options .type .tab {
   background-color: rgba(53, 134, 255, 0.2);
   border-radius: 4px;
   color: #fff;
@@ -650,19 +691,20 @@
   cursor: pointer;
 }
 
-.page .main .container .content  .additional .options .type .active {
+.page .main .container .content .additional .options .type .active {
   background-color: #3586FF;
 }
 
-.page .main .container .content  .additional .options .size {
+.page .main .container .content .additional .options .size {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
   gap: 8px;
   margin-top: -3px;
+  margin-bottom: 15px;
 }
 
-.page .main .container .content  .additional .options .size .tab {
+.page .main .container .content .additional .options .size .tab {
   background-color: rgba(53, 134, 255, 0.2);
   border-radius: 4px;
   color: #fff;
@@ -675,7 +717,40 @@
   cursor: pointer;
 }
 
-.page .main .container .content  .additional .options .size .active {
+.page .main .container .content .additional .options .size .active {
+  background-color: #3586FF;
+}
+
+.page .main .container .content .additional .options .mode {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  gap: 8px;
+  margin-top: -3px;
+}
+
+.page .main .container .content .additional .options .mode .tab {
+  background-color: rgba(53, 134, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  font-family: 'Mate';
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  cursor: pointer;
+}
+
+.page .main .container .content .additional .options .mode .tab span {
+  font-size: 12px;
+  vertical-align: text-top;
+  padding-top: 1.5px;
+  margin-left: 2px;
+  font-variation-settings: 'FILL' 1;
+}
+
+.page .main .container .content .additional .options .mode .active {
   background-color: #3586FF;
 }
 
@@ -683,12 +758,12 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  left: 30px;
+  left: 60px;
   bottom: 20px;
 }
 
 .page .main .container .avaliability .title {
-  color: #fff;
+  color: rgba(255, 255, 255, 0.6);
   font-family: 'Mate';
   font-size: 12px;
   font-weight: 500;

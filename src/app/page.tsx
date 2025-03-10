@@ -6,7 +6,7 @@ import "./fonts.scss";
 import { useRef, useState, useEffect } from 'react';
 
 export default function Home() {
-  const server = '96.241.192.5:44063';
+  const server = '136.38.166.236:34744';
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [imageSrc, setImageSrc] = useState('/pictures/sprite.png');
@@ -25,6 +25,9 @@ export default function Home() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState('PixelCore');
   const [queueStatus, setQueueStatus] = useState<number[]>([0, 0, 0, 0, 0]);
+  const [generationMode, setGenerationMode] = useState('advanced');
+  const [guidanceScale, setGuidanceScale] = useState(15);
+  const [inferenceSteps, setInferenceSteps] = useState(100);
 
   const popularPrompts = [
     'NPC doctor, woman, blond long hair, black glasses',
@@ -123,6 +126,7 @@ export default function Home() {
 
     try {
       console.log('Отправка запроса на генерацию...');
+      const numImages = generationMode === 'advanced' ? 4 : 1;
       const response = await fetch(getApiUrl(), {
         method: 'POST',
         headers: {
@@ -130,8 +134,11 @@ export default function Home() {
         },
         body: JSON.stringify({
           description: description,
-          type: spriteType,
+          type: spriteType.replace('oid', ''),
           size: spriteSize,
+          guidance_scale: guidanceScale,
+          inference_steps: inferenceSteps,
+          num: numImages
         }),
       });
 
@@ -143,7 +150,6 @@ export default function Home() {
       const taskId = data.task_id;
       console.log(`Получен taskId: ${taskId}`);
 
-      // Начинаем опрос статуса задачи
       const checkStatus = setInterval(async () => {
         try {
           console.log(`Опрос статуса задачи ${taskId}...`);
@@ -159,16 +165,21 @@ export default function Home() {
             console.log('Изображения получены:', statusData.images);
             clearInterval(checkStatus);
             const newImages = statusData.images.map((base64Image: string) => `data:image/png;base64,${base64Image}`);
-            setImageSrc(newImages[0]);
-            setImages(newImages);
-            setHistory((prevHistory) => [...prevHistory, ...newImages]);
+
+            if (generationMode === 'simple') {
+              setImageSrc(newImages[0]);
+              setImages([newImages[0]]); // Устанавливаем только одно изображение
+              setHistory((prevHistory) => [...prevHistory, newImages[0]]);
+            } else {
+              setImageSrc(newImages[0]);
+              setImages(newImages);
+              setHistory((prevHistory) => [...prevHistory, ...newImages]);
+            }
             setIsLoading(false);
           } else if (statusData.error) {
             console.error('Ошибка в ответе:', statusData.error);
             clearInterval(checkStatus);
             throw new Error(statusData.error);
-          } else {
-            console.log('Задача еще обрабатывается...');
           }
         } catch (error) {
           console.error('Ошибка при опросе статуса:', error);
@@ -232,6 +243,19 @@ export default function Home() {
   const handleModelSelect = (model: string) => {
     setSelectedModel(model);
     setIsDropdownOpen(false);
+  };
+
+  const handleModeChange = (mode: string) => {
+    setGenerationMode(mode);
+    if (mode === 'advanced' && images.length < 4) {
+      const currentImage = images[0] || imageSrc || '/pictures/sprite.png';
+      setImages([
+        currentImage,
+        currentImage,
+        currentImage,
+        currentImage
+      ]);
+    }
   };
 
   return (
@@ -328,8 +352,7 @@ export default function Home() {
                           className={styles.item}
                           key={index}
                           onClick={() => handlePopularPromptClick(prompt)}
-                          style={{ cursor: 'pointer' }}
-                        >
+                          style={{ cursor: 'pointer' }}>
                           {prompt}
                         </div>
                       ))}
@@ -383,13 +406,12 @@ export default function Home() {
                     rows={1}
                     spellCheck={false}
                     onInput={handleInput}
-                    onKeyDown={handleKeyDown}
-                  />
+                    onKeyDown={handleKeyDown} />
+
                   <div
                     className={styles.enter}
                     onClick={() => handleGenerateImage()}
-                    style={{ pointerEvents: isLoading ? 'none' : 'auto' }}
-                  >
+                    style={{ pointerEvents: isLoading ? 'none' : 'auto' }}>
                     <span className="material-symbols-rounded">arrow_upward</span>
                   </div>
                 </div>
@@ -407,7 +429,8 @@ export default function Home() {
                     <span className="material-symbols-rounded">brush</span>
                   </div>
                 </div>
-                <div className={styles.alternate}>
+                <div className={styles.alternate}
+                  style={{ display: generationMode === 'simple' ? 'none' : 'inline-flex' }}>
                   {images.slice(1).map((src, index) => (
                     <div
                       className={styles.picture}
@@ -420,7 +443,7 @@ export default function Home() {
                     >
                       <Image
                         src={src}
-                        alt={`Alternate Sprite ${index + 1}`}
+                        alt={`Alternate Sprite ${(index + 1)}`}
                         width={128}
                         height={128}
                         unoptimized
@@ -434,36 +457,46 @@ export default function Home() {
 
             <div
               className={styles.additional}
-              style={{ display: isAdditionalOpen ? 'block' : 'none' }}
-            >
+              style={{ display: isAdditionalOpen ? 'block' : 'none' }}>
               <div className={styles.title}>Additional options</div>
               <div className={styles.options}>
                 <div className={styles.label}>Guidance scale</div>
-                <input type="range" />
+                <input
+                  type="range"
+                  value={guidanceScale}
+                  min={5}
+                  max={20}
+                  step={1}
+                  onChange={(e) => setGuidanceScale(parseInt(e.target.value))}
+                />
                 <div className={styles.label}>Inference steps</div>
-                <input type="range" />
+                <input
+                  type="range"
+                  value={inferenceSteps}
+                  min={20}
+                  max={140}
+                  step={10}
+                  onChange={(e) => setInferenceSteps(parseInt(e.target.value))}
+                />
                 <div className={styles.label}>Post-processing</div>
-                <input type="range" />
+                <input type="range" value={-16} min={-64} max={-8} step={4} />
                 <div className={styles.label}>Color unification</div>
                 <input type="range" />
                 <div className={styles.label}>Sprite type</div>
                 <div className={styles.type}>
                   <div
                     className={`${styles.tab} ${spriteType === 'humanoid' ? styles.active : ''}`}
-                    onClick={() => handleSpriteTypeChange('humanoid')}
-                  >
+                    onClick={() => handleSpriteTypeChange('humanoid')}>
                     Humanoid
                   </div>
                   <div
                     className={`${styles.tab} ${spriteType === 'creature' ? styles.active : ''}`}
-                    onClick={() => handleSpriteTypeChange('creature')}
-                  >
+                    onClick={() => handleSpriteTypeChange('creature')}>
                     Creature
                   </div>
                   <div
                     className={`${styles.tab} ${spriteType === 'object' ? styles.active : ''}`}
-                    onClick={() => handleSpriteTypeChange('object')}
-                  >
+                    onClick={() => handleSpriteTypeChange('object')}>
                     Object
                   </div>
                 </div>
@@ -471,21 +504,34 @@ export default function Home() {
                 <div className={styles.size}>
                   <div
                     className={`${styles.tab} ${spriteSize === 'small' ? styles.active : ''}`}
-                    onClick={() => handleSpriteSizeChange('small')}
-                  >
+                    onClick={() => handleSpriteSizeChange('small')}>
                     Small
                   </div>
                   <div
                     className={`${styles.tab} ${spriteSize === 'medium' ? styles.active : ''}`}
-                    onClick={() => handleSpriteSizeChange('medium')}
-                  >
+                    onClick={() => handleSpriteSizeChange('medium')}>
                     Medium
                   </div>
                   <div
                     className={`${styles.tab} ${spriteSize === 'large' ? styles.active : ''}`}
-                    onClick={() => handleSpriteSizeChange('large')}
-                  >
+                    onClick={() => handleSpriteSizeChange('large')}>
                     Large
+                  </div>
+                </div>
+                <div className={styles.label}>Generation mode</div>
+                <div className={styles.mode}>
+                  <div
+                    className={`${styles.tab} ${generationMode === 'simple' ? styles.active : ''}`}
+                    onClick={() => handleModeChange('simple')}>
+                    Simple
+                  </div>
+                  <div
+                    className={`${styles.tab} ${generationMode === 'advanced' ? styles.active : ''}`}
+                    onClick={() => handleModeChange('advanced')} style={{ paddingLeft: '10px' }}>
+                    Advanced
+                    <span className="material-symbols-rounded">
+                      lock
+                    </span>
                   </div>
                 </div>
               </div>
