@@ -28,6 +28,7 @@ export default function Home() {
   const [generationMode, setGenerationMode] = useState('advanced');
   const [guidanceScale, setGuidanceScale] = useState(15);
   const [inferenceSteps, setInferenceSteps] = useState(100);
+  const [showToast, setShowToast] = useState(false);
 
   const popularPrompts = [
     'NPC doctor, woman, blond long hair, black glasses',
@@ -39,6 +40,45 @@ export default function Home() {
     'Village blacksmith, muscular, holding a hammer',
     'Forest ranger, female, green cape, binoculars'
   ];
+
+  // Анимация placeholder
+  const animatedPrompts = [
+    "NPC nurse, young woman, short red hair, white uniform",
+    "Gardener with a shovel, old man, gray beard",
+    "Jungle explorer with a machete, tall, brown hat"
+  ];
+  const [animatedPlaceholder, setAnimatedPlaceholder] = useState("");
+  const [currentAnimatedPromptIndex, setCurrentAnimatedPromptIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentText = animatedPrompts[currentAnimatedPromptIndex];
+    let timeout;
+    const typingSpeed = 50;
+    const deletingSpeed = 20;
+    const pauseDuration = 1500;
+    if (!isDeleting) {
+      if (animatedPlaceholder.length < currentText.length) {
+        timeout = setTimeout(() => {
+          setAnimatedPlaceholder(currentText.substring(0, animatedPlaceholder.length + 1));
+        }, typingSpeed);
+      } else {
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, pauseDuration);
+      }
+    } else {
+      if (animatedPlaceholder.length > 0) {
+        timeout = setTimeout(() => {
+          setAnimatedPlaceholder(currentText.substring(0, animatedPlaceholder.length - 1));
+        }, deletingSpeed);
+      } else {
+        setIsDeleting(false);
+        setCurrentAnimatedPromptIndex((prev) => (prev + 1) % animatedPrompts.length);
+      }
+    }
+    return () => clearTimeout(1);
+  }, [animatedPlaceholder, isDeleting, currentAnimatedPromptIndex]);
 
   // Функция для получения статуса очереди
   const fetchQueueStatus = async () => {
@@ -72,6 +112,7 @@ export default function Home() {
     } catch (error) {
       console.error('Ошибка при получении статуса:', error);
       setQueueStatus([0, 0, 0, 0, 0]);
+      setShowToast(true);
     }
   };
 
@@ -380,7 +421,7 @@ export default function Home() {
                   <div className={styles.saved} style={{ display: activeTab === 'saved' ? 'block' : 'none' }}>
                     <div className={styles.title}>Saved</div>
                     <div className={styles.items}>
-                      <div className={styles.item}>Saved prompt 1</div>
+                      <div className={styles.item}>...</div>
                     </div>
                   </div>
                 </div>
@@ -402,7 +443,7 @@ export default function Home() {
                 <div className={styles.prompt}>
                   <textarea
                     ref={textareaRef}
-                    placeholder="Prompt"
+                    placeholder={animatedPlaceholder}
                     rows={1}
                     spellCheck={false}
                     onInput={handleInput}
@@ -414,6 +455,13 @@ export default function Home() {
                     style={{ pointerEvents: isLoading ? 'none' : 'auto' }}>
                     <span className="material-symbols-rounded">arrow_upward</span>
                   </div>
+
+                  <div
+                    className={styles.random}
+                    onClick={() => handleGenerateImage()}
+                    style={{ pointerEvents: isLoading ? 'none' : 'auto' }}>
+                    <span className="material-symbols-rounded">ifl</span>
+                  </div>
                 </div>
               </div>
 
@@ -421,8 +469,7 @@ export default function Home() {
                 <div className={styles.menu}>
                   <div
                     className={`${styles.additional} ${isAdditionalOpen ? styles.active : ''}`}
-                    onClick={toggleAdditionalPanel}
-                  >
+                    onClick={toggleAdditionalPanel}>
                     <span className="material-symbols-rounded">more_horiz</span>
                   </div>
                   <div className={styles.edit}>
@@ -438,7 +485,7 @@ export default function Home() {
                       style={{
                         opacity: isLoading ? 0 : 1,
                         transform: isLoading ? 'translateX(-112%)' : 'none',
-                        transitionDelay: `${(index + 1) / 5}s`,
+                        transition: `transform 0.3s ease ${(index + 1) / 4}s, background-color 0.1s, opacity 0.3s ease ${(index + 1) / 4}s`,
                       }}
                     >
                       <Image
@@ -538,6 +585,21 @@ export default function Home() {
             </div>
           </div>
 
+          <div className={`${styles.toast} ${showToast ? styles.active_toast : ''}`}>
+            <Image className={styles.icon}
+              src="/pictures/attention.gif"
+              alt="ERROR" width={64} height={50} />
+            <div className={styles.text}>
+              <div className={styles.title}>Attention</div>
+              <div className={styles.subtitle}>Dear user, the generation service is<br></br>temporarily unavailable (Error-503).</div>
+            </div>
+            <span className="material-symbols-rounded" onClick={() => setShowToast(false)}>close</span>
+            <Image className={styles.mark}
+              src="/pictures/attention.png"
+              alt="Attention" width={24} height={24}
+              unoptimized />
+          </div>
+
           <div className={styles.avaliability}>
             <div className={styles.title}>Availability</div>
             <div className={styles.list}>
@@ -549,6 +611,8 @@ export default function Home() {
               ))}
             </div>
           </div>
+
+          <div className={styles.fade} style={{ display: isDropdownOpen ? 'block' : 'none' }}></div>
         </div>
       </main>
     </div>

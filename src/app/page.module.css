@@ -2,6 +2,7 @@
   width: 100%;
   height: 100vh;
   background-color: #080B20;
+  overflow: hidden;
 }
 
 .page .main {
@@ -31,6 +32,7 @@
   height: 40px;
   position: relative;
   display: inline-flex;
+  user-select: none;
 }
 
 .page .main .container .nav .model img {
@@ -56,6 +58,7 @@
   display: inline-flex;
   align-items: center;
   cursor: pointer;
+  z-index: 3;
 }
 
 .page .main .container .nav .model .icon {
@@ -66,6 +69,7 @@
   border-radius: 0 6px 6px 0;
   margin-right: 12px;
   cursor: pointer;
+  z-index: 3;
 }
 
 .page .main .container .nav .model .icon span {
@@ -388,6 +392,21 @@
   transition: 0.1s;
 }
 
+.page .main .container .content .base .left .tabs .saved {
+  display: block;
+  margin-left: 15px;
+}
+
+.page .main .container .content .base .left .tabs .saved .title {
+  color: #fff;
+  font-family: 'Mate';
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: -2px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
 .page .main .container .content .base .center {
   height: 100%;
   position: relative;
@@ -516,7 +535,7 @@
 
 .page .main .container .content .base .center .prompt .random span {
   position: absolute;
-  top: 49%;
+  top: 49.5%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #fff;
@@ -598,7 +617,10 @@
   aspect-ratio: 1 / 1;
   border-radius: 6px;
   padding: 6px;
-  transition: 0.3s ease;
+}
+
+.page .main .container .content .base .right .alternate .picture:hover {
+  background-color: #3586FF;
 }
 
 .page .main .container .content .base .right .alternate .picture img {
@@ -754,12 +776,84 @@
   background-color: #3586FF;
 }
 
+.page .main .container .toast {
+  background-color: rgba(53, 134, 255, 0.2);
+  border-radius: 8px;
+  padding-top: 10px;
+  padding-left: 5px;
+  padding-right: 40px;
+  padding-bottom: 15px;
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  right: 60px;
+  bottom: 30px;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.page .main .container .active_toast {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page .main .container .toast .icon {
+  display: inline-flex;
+  margin-top: -3px;
+  margin-right: 3px;
+}
+
+.page .main .container .toast .text {
+  display: flex;
+  flex-direction: column;
+}
+
+.page .main .container .toast .text .title {
+  color: #3586FF;
+  font-family: 'Mate';
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.page .main .container .toast .text .subtitle {
+  color: rgba(255, 255, 255, 0.75);
+  font-family: 'Mate';
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 12px;
+  letter-spacing: 3%;
+}
+
+.page .main .container .toast span {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+  font-variation-settings: 'FILL' 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.page .main .container .toast span:hover {
+  color: #fff;
+}
+
+.page .main .container .toast .mark {
+  position: absolute;
+  top: 10px;
+  right: calc(100% + 2px);
+  opacity: 0.9;
+}
+
 .page .main .container .avaliability {
   position: absolute;
   display: flex;
   flex-direction: column;
   left: 60px;
-  bottom: 20px;
+  bottom: 30px;
 }
 
 .page .main .container .avaliability .title {
@@ -788,4 +882,14 @@
   height: 14px;
   background-color: rgba(53, 134, 255, 0.2);
   border-radius: 2px;
+}
+
+.fade {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
 }
