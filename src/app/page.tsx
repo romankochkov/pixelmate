@@ -6,7 +6,7 @@ import "./fonts.scss";
 import { useRef, useState, useEffect } from 'react';
 
 export default function Home() {
-  const server = process.env.GPU_SERVER;
+  const server = process.env.NEXT_PUBLIC_SERVER?.toString();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [imageSrc, setImageSrc] = useState('/pictures/sprite.png');
