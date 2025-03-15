@@ -6,7 +6,7 @@ import "./fonts.scss";
 import { useRef, useState, useEffect } from 'react';
 
 export default function Home() {
-  const server = '174.95.137.158:45201';
+  const server = '174.95.137.158:45012';
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [imageSrc, setImageSrc] = useState('/pictures/sprite.png');
@@ -25,7 +25,7 @@ export default function Home() {
   const [isModelDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState('PixelCore');
   const [queueStatus, setQueueStatus] = useState<number[]>([0, 0, 0, 0, 0]);
-  const [generationMode, setGenerationMode] = useState('advanced');
+  const [generationMode, setGenerationMode] = useState('simple');
   const [guidanceScale, setGuidanceScale] = useState(10);
   const [inferenceSteps, setInferenceSteps] = useState(70);
   const [showToast, setShowToast] = useState(false);
@@ -34,8 +34,15 @@ export default function Home() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [isBackgroundRemoved, setIsBackgroundRemoved] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [queuePosition, setQueuePosition] = useState(null);
+  const [queueTotal, setQueueTotal] = useState(null);
   const [hasError, setHasError] = useState(false);
-
+  const queueMessages = [
+    "Already close to a<br />masterpiece...",
+    "Wait for your<br />portion of magic...",
+    "Your moment is<br />almost here..."
+  ];
+  const [queueMessage, setQueueMessage] = useState(queueMessages[0]);
 
   const fetchPopularPrompts = async () => {
     try {
@@ -190,6 +197,34 @@ export default function Home() {
     }
   };
 
+  const fetchQueuePosition = async (taskId: string) => {
+    try {
+      const response = await fetch(`http://${server}/api/task/${taskId}/position`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка при получении позиции в очереди');
+      }
+
+      const data = await response.json();
+      if (data.position && data.total) {
+        setQueuePosition(data.position);
+        setQueueTotal(data.total);
+      } else {
+        setQueuePosition(null);
+        setQueueTotal(null);
+      }
+    } catch (error) {
+      console.error('Ошибка при получении позиции в очереди:', error);
+      setQueuePosition(null);
+      setQueueTotal(null);
+    }
+  };
+
   const handleGenerateImage = async (prompt?: string) => {
     if (isLoading) return;
 
@@ -204,8 +239,11 @@ export default function Home() {
       textarea.value = description;
     }
 
+    const randomMessage = queueMessages[Math.floor(Math.random() * queueMessages.length)];
+    setQueueMessage(randomMessage);
+
     setIsLoading(true);
-    setIsGenerated(false); // Скрываем кнопки при начале новой генерации
+    setIsGenerated(false);
 
     try {
       console.log('Отправка запроса на генерацию...');
@@ -233,6 +271,11 @@ export default function Home() {
       const taskId = data.task_id;
       console.log(`Получен taskId: ${taskId}`);
 
+      // Запуск интервала для проверки позиции в очереди
+      const positionInterval = setInterval(() => {
+        fetchQueuePosition(taskId);
+      }, 2000);
+
       const checkStatus = setInterval(async () => {
         try {
           console.log(`Опрос статуса задачи ${taskId}...`);
@@ -247,6 +290,9 @@ export default function Home() {
           if (statusData.images) {
             console.log('Изображения получены:', statusData.images);
             clearInterval(checkStatus);
+            clearInterval(positionInterval); // Останавливаем проверку позиции
+            setQueuePosition(null);
+            setQueueTotal(null);
             const newImages = statusData.images.map((base64Image: string) => `data:image/png;base64,${base64Image}`);
 
             if (generationMode === 'simple') {
@@ -267,11 +313,17 @@ export default function Home() {
           } else if (statusData.error) {
             console.error('Ошибка в ответе:', statusData.error);
             clearInterval(checkStatus);
+            clearInterval(positionInterval);
+            setQueuePosition(null);
+            setQueueTotal(null);
             throw new Error(statusData.error);
           }
         } catch (error) {
           console.error('Ошибка при опросе статуса:', error);
           clearInterval(checkStatus);
+          clearInterval(positionInterval);
+          setQueuePosition(null);
+          setQueueTotal(null);
           alert('Ошибка при получении изображений');
           setIsLoading(false);
           setIsGenerated(false);
@@ -283,6 +335,8 @@ export default function Home() {
       alert('Не удалось начать генерацию изображений');
       setIsLoading(false);
       setIsGenerated(false);
+      setQueuePosition(null);
+      setQueueTotal(null);
     }
   };
 
@@ -655,7 +709,20 @@ export default function Home() {
 
               <div className={styles.center}>
                 <div className={styles.picture}>
-                  {isLoading && <div className={styles.loader}></div>}
+                  {isLoading && (
+                    <>
+                      {queuePosition && queueTotal && queuePosition > 1 && (
+                        <div className={styles.queue}>
+                          <div className={styles.title}>#{queuePosition}<span>/{queueTotal}</span></div>
+                          <div className={styles.subtitle} dangerouslySetInnerHTML={{ __html: queueMessage }} />
+                        </div>
+                      )}
+                      {(queuePosition === null || queuePosition === 1) && (
+                        <div className={styles.loader}></div>
+                      )}
+                    </>
+                  )}
+                  {isLoading && !queuePosition && !queueTotal && <div className={styles.loader}></div>}
                   <Image
                     src={imageSrc}
                     alt="Sprite"
@@ -663,7 +730,7 @@ export default function Home() {
                     height={128}
                     unoptimized
                     key={imageSrc}
-                    style={{ opacity: isLoading ? 0.1 : 1 }}
+                    style={{ opacity: isLoading ? 0.02 : 1 }}
                   />
                 </div>
                 <div className={styles.prompt}>
@@ -756,8 +823,8 @@ export default function Home() {
                 <input
                   type="range"
                   value={guidanceScale}
-                  min={2}
-                  max={16}
+                  min={5}
+                  max={20}
                   step={1}
                   onChange={(e) => setGuidanceScale(parseInt(e.target.value))}
                 />
@@ -771,7 +838,7 @@ export default function Home() {
                   onChange={(e) => setInferenceSteps(parseInt(e.target.value))}
                 />
                 <div className={styles.label}>Post-processing</div>
-                <input type="range" value={-16} min={-64} max={-8} step={4} />
+                <input type="range" />
                 <div className={styles.label}>Color unification</div>
                 <input type="range" />
                 <div className={styles.label}>Sprite type</div>
@@ -849,20 +916,17 @@ export default function Home() {
             <div className={styles.status}>
               <div className={styles.title}>Status</div>
               <div className={styles.list}>
-                {hasError ? null : (
-                  queueStatus.filter(status => status === 1).length > 1 && (
-                    <>
-                      <div className={styles.online}></div>
-                      <div className={styles.text_online}>ONLINE</div>
-                    </>
-                  )
-                )}
-                {hasError || queueStatus.filter(status => status === 1).length <= 1 ? (
+                {!hasError ? (
+                  <>
+                    <div className={styles.online}></div>
+                    <div className={styles.text_online}>ONLINE</div>
+                  </>
+                ) : (
                   <>
                     <div className={styles.offline}></div>
                     <div className={styles.text_offline}>OFFLINE</div>
                   </>
-                ) : null}
+                )}
               </div>
             </div>
 

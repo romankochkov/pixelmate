@@ -668,6 +668,40 @@
   object-fit: contain;
 }
 
+.page .main .container .content .base .center .picture .queue {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.page .main .container .content .base .center .picture .queue .title {
+  color: #3586FF;
+  font-family: 'Mate';
+  font-size: 50px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.page .main .container .content .base .center .picture .queue .title span {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Mate';
+  font-size: 24px;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+.page .main .container .content .base .center .picture .queue .subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Mate';
+  font-size: 18px;
+  font-weight: 400;
+  text-align: center;
+}
+
 .page .main .container .content .base .center .picture .loader {
   width: 60px;
   aspect-ratio: 1;
