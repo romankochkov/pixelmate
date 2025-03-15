@@ -6,7 +6,7 @@ import "./fonts.scss";
 import { useRef, useState, useEffect } from 'react';
 
 export default function Home() {
-  const server = '174.95.137.158:45012';
+  const server = process.env.GPU_SERVER;
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [imageSrc, setImageSrc] = useState('/pictures/sprite.png');
@@ -900,7 +900,8 @@ export default function Home() {
           <div className={`${styles.toast} ${showToast ? styles.active_toast : ''}`}>
             <Image className={styles.icon}
               src="/pictures/attention.gif"
-              alt="ERROR" width={64} height={50} />
+              alt="ERROR" width={64} height={50}
+              unoptimized />
             <div className={styles.text}>
               <div className={styles.title}>Attention</div>
               <div className={styles.subtitle}>Dear user, the generation service is<br></br>temporarily unavailable (Error-503).</div>
