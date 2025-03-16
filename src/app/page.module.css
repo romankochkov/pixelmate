@@ -170,6 +170,15 @@
   border-radius: 6px;
   margin-right: 12px;
   transition: 0.1s;
+}
+
+.page .main .container .nav .menu .notification .clickArea {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
   cursor: pointer;
 }
 
@@ -185,6 +194,94 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 19px;
   font-variation-settings: 'FILL' 1;
+}
+
+.page .main .container .nav .menu .notification .dropdown {
+  min-width: 420px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  background-color: #171E46;
+  border-radius: 6px;
+  padding-top: 16px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 19px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 14px;
+  z-index: 3;
+}
+
+.page .main .container .nav .menu .notification .dropdown .title {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Mate';
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items {
+  display: flex;
+  flex-direction: row;
+  row-gap: 10px;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items .item {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  column-gap: 12px;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items .item img {
+  width: 30px;
+  height: 30px;
+  aspect-ratio: 1 / 1;
+  image-rendering: pixelated;
+  background-color: rgba(53, 134, 255, 0.2);
+  border-radius: 6px;
+  margin-bottom: 7px;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items .item .icon {
+  width: 30px;
+  height: 30px;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  background-color: rgba(53, 134, 255, 0.2);
+  border-radius: 6px;
+  display: flex;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items .item .icon span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #3586FF;
+  font-size: 22px;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items .item .text {
+  display: flex;
+  flex-direction: column;
+  row-gap: 7px;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items .item .text .description {
+  color: #fff;
+  font-family: 'Mate';
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: -2px;
+}
+
+.page .main .container .nav .menu .notification .dropdown .items .item .text .date {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Mate';
+  font-size: 11px;
+  font-weight: 400;
 }
 
 .page .main .container .nav .menu .user {
@@ -1249,6 +1346,11 @@
   .page .main .container .nav .model .button {
     padding-top: 1.5px;
     padding-bottom: 0;
+  }
+
+  .page .main .container .nav .menu .notification .dropdown {
+    min-width: 96vi;
+    right: -150%;
   }
 
   .page .main .container .content .base {

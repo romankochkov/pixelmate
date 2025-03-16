@@ -34,6 +34,7 @@ export default function Home() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [isBackgroundRemoved, setIsBackgroundRemoved] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const [queuePosition, setQueuePosition] = useState(null);
   const [queueTotal, setQueueTotal] = useState(null);
   const [hasError, setHasError] = useState(false);
@@ -577,9 +578,42 @@ export default function Home() {
               </div>
             </div>
             <div className={styles.menu}>
-              <div className={styles.notification}>
+              <div className={styles.notification} style={{ zIndex: isNotificationDropdownOpen ? '3' : '2' }}>
+                <div
+                  className={styles.clickArea}
+                  onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}>
+                </div>
+
                 <span className="material-symbols-rounded">notifications</span>
+
+                <div className={styles.dropdown} style={{ display: isNotificationDropdownOpen ? 'flex' : 'none' }}>
+                  <div className={styles.title}>Notifications</div>
+                  <div className={styles.items}>
+                    <div className={styles.item}>
+                      <div>
+                        <Image
+                          src="https://cdna.artstation.com/p/assets/images/images/020/042/190/large/joanna-revv-szymanska-1.jpg?1566126853"
+                          alt=""
+                          width={30}
+                          height={30}
+                          unoptimized
+                        />
+                        <div className={styles.icon}>
+                          <span className="material-symbols-rounded">
+                            info
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className={styles.text}>
+                        <div className={styles.description}>We regret to inform you that our generation servers are currently unavailable due to a technical issue. Our team is working diligently to resolve the problem as quickly as possible. We apologize for any inconvenience this may cause and appreciate your patience while we restore full functionality.</div>
+                        <div className={styles.date}>3 hours ago</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
               <div className={styles.user} style={{ zIndex: isUserDropdownOpen ? '3' : '2' }}>
                 <div
                   className={styles.clickArea}
@@ -946,6 +980,7 @@ export default function Home() {
 
           <div className={styles.fade} style={{ display: isModelDropdownOpen ? 'block' : 'none' }}></div>
           <div className={styles.fade} style={{ display: isUserDropdownOpen ? 'block' : 'none' }}></div>
+          <div className={styles.fade} style={{ display: isNotificationDropdownOpen ? 'block' : 'none' }}></div>
         </div>
       </main>
     </div>
