@@ -19,7 +19,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
-  const [isAdditionalOpen, setIsAdditionalOpen] = useState(false);
+  const [activeRightPanel, setActiveRightPanel] = useState<string | null>(null);
   const [spriteType, setSpriteType] = useState('humanoid');
   const [spriteSize, setSpriteSize] = useState('large');
   const [isModelDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -28,6 +28,7 @@ export default function Home() {
   const [generationMode, setGenerationMode] = useState('simple');
   const [guidanceScale, setGuidanceScale] = useState(10);
   const [inferenceSteps, setInferenceSteps] = useState(70);
+  const [postProcessing, setPostProcessing] = useState(-32);
   const [showToast, setShowToast] = useState(false);
   const [popularPrompts, setPopularPrompts] = useState<string[]>([]);
   const [isGenerated, setIsGenerated] = useState(false);
@@ -35,6 +36,7 @@ export default function Home() {
   const [isBackgroundRemoved, setIsBackgroundRemoved] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+  const [colorPalette, setColorPalette] = useState<string[]>(Array(18).fill('#21233D'));
   const [queuePosition, setQueuePosition] = useState(null);
   const [queueTotal, setQueueTotal] = useState(null);
   const [hasError, setHasError] = useState(false);
@@ -44,6 +46,280 @@ export default function Home() {
     "Your moment is<br />almost here..."
   ];
   const [queueMessage, setQueueMessage] = useState(queueMessages[0]);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageDataRef = useRef<ImageData | null>(null);
+  const lastPositionRef = useRef<{ x: number; y: number } | null>(null);
+  const [selectedTool, setSelectedTool] = useState<'brush' | 'eraser' | 'fill' | 'picker'>('brush');
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [brushSize] = useState(1);
+
+  const [editHistory, setEditHistory] = useState<string[]>(['/pictures/sprite.png']);
+  const [editHistoryIndex, setEditHistoryIndex] = useState(0);
+
+  const initializeCanvas = (src: string) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = 128;
+    canvas.height = 128;
+    ctx.imageSmoothingEnabled = false;
+
+    const img = new window.Image();
+    img.crossOrigin = "Anonymous";
+    img.src = src;
+
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, 128, 128);
+    };
+    img.onerror = () => {
+      console.error('Ошибка загрузки изображения:', src);
+    };
+  };
+
+  useEffect(() => {
+    if (imageSrc && canvasRef.current) {
+      initializeCanvas(imageSrc);
+    }
+  }, [imageSrc]);
+
+  useEffect(() => {
+    if (activeRightPanel !== 'paint' && isDrawing) {
+      stopDrawing();
+    }
+  }, [activeRightPanel, isDrawing]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'z') {
+        undo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editHistory, editHistoryIndex]);
+
+  function* bresenhamLine(x0: number, y0: number, x1: number, y1: number) {
+    const dx = Math.abs(x1 - x0);
+    const dy = Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
+    let err = dx - dy;
+
+    while (true) {
+      yield { x: x0, y: y0 };
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 > -dy) {
+        err -= dy;
+        x0 += sx;
+      }
+      if (e2 < dx) {
+        err += dx;
+        y0 += sy;
+      }
+    }
+  }
+
+  const setPixel = (x: number, y: number) => {
+    if (!imageDataRef.current || !canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const index = (y * canvas.width + x) * 4;
+    if (selectedTool === 'brush') {
+      const colorInput = document.querySelector('input[type="color"]') as HTMLInputElement;
+      const color = hexToRgb(colorInput?.value || '#000000');
+      imageDataRef.current.data[index] = color[0];
+      imageDataRef.current.data[index + 1] = color[1];
+      imageDataRef.current.data[index + 2] = color[2];
+      imageDataRef.current.data[index + 3] = 255;
+    } else if (selectedTool === 'eraser') {
+      imageDataRef.current.data[index + 3] = 0; // Прозрачность для ластика
+    }
+  };
+
+  const undo = () => {
+    if (editHistoryIndex > 0) {
+      const prevIndex = editHistoryIndex - 1;
+      const prevImageSrc = editHistory[prevIndex];
+      setImageSrc(prevImageSrc);
+      setImages(prev => [prevImageSrc, ...prev.slice(1)]);
+      setEditHistoryIndex(prevIndex);
+
+      // Обновляем холст
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          const img = new window.Image();
+          img.src = prevImageSrc;
+          img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          };
+        }
+      }
+    }
+  };
+
+  // Обработчики рисования
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = Math.floor((e.clientX - rect.left) * scaleX);
+    const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+    if (selectedTool === 'picker') {
+      const imageData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+      const [r, g, b] = imageData;
+      const hexColor = rgbToHex(`rgb(${r},${g},${b})`);
+      const colorInput = document.querySelector('input[type="color"]') as HTMLInputElement;
+      if (colorInput) {
+        colorInput.value = hexColor;
+      }
+      setSelectedTool('brush');
+      return;
+    }
+
+    // Инициализация данных изображения
+    imageDataRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    setIsDrawing(true);
+    lastPositionRef.current = { x, y };
+
+    // Устанавливаем начальный пиксель
+    if (selectedTool === 'brush' || selectedTool === 'eraser') {
+      setPixel(x, y);
+      ctx.putImageData(imageDataRef.current, 0, 0);
+    } else if (selectedTool === 'fill') {
+      const colorInput = document.querySelector('input[type="color"]') as HTMLInputElement;
+      floodFill(ctx, x, y, hexToRgb(colorInput?.value || '#000000'));
+      const newImageSrc = canvas.toDataURL('image/png');
+      setImageSrc(newImageSrc);
+      setImages(prev => [newImageSrc, ...prev.slice(1)]);
+      setIsDrawing(false);
+    }
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !imageDataRef.current || !canvasRef.current || selectedTool === 'fill' || selectedTool === 'picker') return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = Math.floor((e.clientX - rect.left) * scaleX);
+    const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+    if (lastPositionRef.current) {
+      const { x: lastX, y: lastY } = lastPositionRef.current;
+      for (const { x: px, y: py } of bresenhamLine(lastX, lastY, x, y)) {
+        setPixel(px, py);
+      }
+    } else {
+      setPixel(x, y);
+    }
+
+    lastPositionRef.current = { x, y };
+    ctx.putImageData(imageDataRef.current, 0, 0);
+  };
+
+  // Обновленный stopDrawing
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    imageDataRef.current = null;
+    lastPositionRef.current = null;
+
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const newImageSrc = canvas.toDataURL('image/png');
+      setImageSrc(newImageSrc);
+      setImages(prev => [newImageSrc, ...prev.slice(1)]); // Обновляем текущее изображение
+
+      // Сохраняем только в историю изменений
+      setEditHistory(prev => {
+        const newHistory = prev.slice(0, editHistoryIndex + 1); // Убираем состояния после текущего
+        newHistory.push(newImageSrc);
+        if (newHistory.length > 10) newHistory.shift(); // Ограничиваем длину истории
+        return newHistory;
+      });
+      setEditHistoryIndex(prev => prev + 1);
+    }
+  };
+
+  const floodFill = (ctx: CanvasRenderingContext2D, x: number, y: number, fillColor: number[]) => {
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    const targetColor = getPixelColor(imageData, x, y);
+    if (colorsMatch(targetColor, fillColor)) return;
+
+    const pixelsToCheck = [{ x, y }];
+    while (pixelsToCheck.length > 0) {
+      const { x, y } = pixelsToCheck.pop()!;
+      const currentColor = getPixelColor(imageData, x, y);
+
+      if (colorsMatch(currentColor, targetColor)) {
+        setPixelColor(imageData, x, y, fillColor);
+
+        if (x > 0) pixelsToCheck.push({ x: x - 1, y });
+        if (x < ctx.canvas.width - 1) pixelsToCheck.push({ x: x + 1, y });
+        if (y > 0) pixelsToCheck.push({ x, y: y - 1 });
+        if (y < ctx.canvas.height - 1) pixelsToCheck.push({ x, y: y + 1 });
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  };
+
+  const getPixelColor = (imageData: ImageData, x: number, y: number) => {
+    const index = (y * imageData.width + x) * 4;
+    return [
+      imageData.data[index],
+      imageData.data[index + 1],
+      imageData.data[index + 2],
+      imageData.data[index + 3]
+    ];
+  };
+
+  const setPixelColor = (imageData: ImageData, x: number, y: number, color: number[]) => {
+    const index = (y * imageData.width + x) * 4;
+    imageData.data[index] = color[0];
+    imageData.data[index + 1] = color[1];
+    imageData.data[index + 2] = color[2];
+    imageData.data[index + 3] = 255;
+  };
+
+  const colorsMatch = (color1: number[], color2: number[]) => {
+    return color1[0] === color2[0] &&
+      color1[1] === color2[1] &&
+      color1[2] === color2[2];
+  };
+
+  const hexToRgb = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return [r, g, b];
+  };
+
+  // Обработчик выбора инструмента
+  const handleToolSelect = (tool: 'brush' | 'eraser' | 'fill' | 'picker') => {
+    setSelectedTool(tool);
+  };
 
   const fetchPopularPrompts = async () => {
     try {
@@ -73,8 +349,7 @@ export default function Home() {
         'Gardener with a shovel, old man, gray beard',
         'Jungle explorer with a machete, tall, brown hat',
         'Village blacksmith, muscular, holding a hammer',
-        'Forest ranger, female, green cape, binoculars',
-        'Merchant with gold coins, middle-aged, fancy robes'
+        'Forest ranger, female, green cape, binoculars'
       ]);
     }
   };
@@ -260,6 +535,7 @@ export default function Home() {
           size: spriteSize,
           guidance_scale: guidanceScale,
           inference_steps: inferenceSteps,
+          num_colors: Math.abs(postProcessing),
           num: numImages
         }),
       });
@@ -272,7 +548,6 @@ export default function Home() {
       const taskId = data.task_id;
       console.log(`Получен taskId: ${taskId}`);
 
-      // Запуск интервала для проверки позиции в очереди
       const positionInterval = setInterval(() => {
         fetchQueuePosition(taskId);
       }, 2000);
@@ -291,7 +566,7 @@ export default function Home() {
           if (statusData.images) {
             console.log('Изображения получены:', statusData.images);
             clearInterval(checkStatus);
-            clearInterval(positionInterval); // Останавливаем проверку позиции
+            clearInterval(positionInterval);
             setQueuePosition(null);
             setQueueTotal(null);
             const newImages = statusData.images.map((base64Image: string) => `data:image/png;base64,${base64Image}`);
@@ -306,11 +581,17 @@ export default function Home() {
               setHistory((prevHistory) => [...prevHistory, ...newImages]);
             }
 
+            setEditHistory([newImages[0]]);
+            setEditHistoryIndex(0);
+
             setIsBackgroundRemoved(false);
             setOriginalImage(null);
-
             setIsLoading(false);
             setIsGenerated(true);
+
+            if (activeRightPanel === 'paint') {
+              await generateColorPalette(newImages[0]);
+            }
           } else if (statusData.error) {
             console.error('Ошибка в ответе:', statusData.error);
             clearInterval(checkStatus);
@@ -366,14 +647,27 @@ export default function Home() {
 
     setIsBackgroundRemoved(false);
     setOriginalImage(newImages[0]);
+
+    // Устанавливаем начальное состояние в историю изменений
+    setEditHistory([newImages[0]]); // Начальное состояние
+    setEditHistoryIndex(0); // Указываем на начальное состояние
+
+    if (isGenerated && activeRightPanel === 'paint') {
+      generateColorPalette(newImages[0]);
+    }
   };
 
   const handleTabClick = (tab: string) => {
     setActiveTab(activeTab === tab ? null : tab);
   };
 
-  const toggleAdditionalPanel = () => {
-    setIsAdditionalOpen(!isAdditionalOpen);
+  const toggleRightPanel = (panel: string) => {
+    const newPanel = activeRightPanel === panel ? null : panel;
+    setActiveRightPanel(newPanel);
+
+    if (newPanel === 'paint' && isGenerated && imageSrc) {
+      generateColorPalette(imageSrc);
+    }
   };
 
   const handleSpriteTypeChange = (type: string) => {
@@ -493,6 +787,63 @@ export default function Home() {
     }
   };
 
+  const generateColorPalette = async (imageUrl: string) => {
+    try {
+      // Load the image
+      const img = new window.Image();
+      img.crossOrigin = "Anonymous";
+      img.src = imageUrl;
+
+      await new Promise((resolve) => {
+        img.onload = resolve;
+      });
+
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) return;
+
+      // Draw image and get pixel data
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      // Count colors
+      const colorCount: { [key: string]: number } = {};
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        // Skip transparent pixels
+        if (a === 0) continue;
+
+        const rgb = `rgb(${r},${g},${b})`;
+        colorCount[rgb] = (colorCount[rgb] || 0) + 1;
+      }
+
+      // Sort colors by frequency and take top 18
+      const sortedColors = Object.entries(colorCount)
+        .sort(([, countA], [, countB]) => countB - countA)
+        .slice(0, 18)
+        .map(([color]) => color);
+
+      // Fill remaining slots with white if less than 18 colors
+      while (sortedColors.length < 18) {
+        sortedColors.push('rgb(255,255,255)');
+      }
+
+      setColorPalette(sortedColors);
+    } catch (error) {
+      console.error('Error generating color palette:', error);
+      setColorPalette(Array(18).fill('#ffffff'));
+    }
+  };
+
   const handleDownload = () => {
     if (!isGenerated || !imageSrc) return;
 
@@ -523,6 +874,11 @@ export default function Home() {
         ))}
       </div>
     );
+  };
+
+  const rgbToHex = (rgb: string) => {
+    const [r, g, b] = rgb.match(/\d+/g)!.map(Number);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   };
 
   return (
@@ -757,14 +1113,17 @@ export default function Home() {
                     </>
                   )}
                   {isLoading && !queuePosition && !queueTotal && <div className={styles.loader}></div>}
-                  <Image
-                    src={imageSrc}
-                    alt="Sprite"
-                    width={128}
-                    height={128}
-                    unoptimized
-                    key={imageSrc}
-                    style={{ opacity: isLoading ? 0.02 : 1 }}
+                  <canvas
+                    ref={canvasRef}
+                    style={{
+                      opacity: isLoading ? 0.02 : 1,
+                      cursor: selectedTool === 'picker' ? 'crosshair' : 'default',
+                      pointerEvents: activeRightPanel === 'paint' ? 'auto' : 'none'
+                    }}
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseOut={stopDrawing}
                   />
                 </div>
                 <div className={styles.prompt}>
@@ -814,11 +1173,13 @@ export default function Home() {
               <div className={styles.right}>
                 <div className={styles.menu}>
                   <div
-                    className={`${styles.additional} ${isAdditionalOpen ? styles.active : ''}`}
-                    onClick={toggleAdditionalPanel}>
+                    className={`${styles.additional} ${activeRightPanel === 'additional' ? styles.active : ''}`}
+                    onClick={() => toggleRightPanel('additional')}>
                     <span className="material-symbols-rounded">more_horiz</span>
                   </div>
-                  <div className={styles.edit}>
+                  <div
+                    className={`${styles.edit} ${activeRightPanel === 'paint' ? styles.active : ''}`}
+                    onClick={() => toggleRightPanel('paint')}>
                     <span className="material-symbols-rounded">brush</span>
                   </div>
                 </div>
@@ -850,7 +1211,7 @@ export default function Home() {
 
             <div
               className={styles.additional}
-              style={{ display: isAdditionalOpen ? 'block' : 'none' }}>
+              style={{ display: activeRightPanel === 'additional' ? 'block' : 'none' }}>
               <div className={styles.title}>Additional options</div>
               <div className={styles.options}>
                 <div className={styles.label}>Guidance scale</div>
@@ -872,7 +1233,14 @@ export default function Home() {
                   onChange={(e) => setInferenceSteps(parseInt(e.target.value))}
                 />
                 <div className={styles.label}>Post-processing</div>
-                <input type="range" />
+                <input
+                  type="range"
+                  min="-64"
+                  max="-14"
+                  step="2"
+                  value={postProcessing}
+                  onChange={(e) => setPostProcessing(parseInt(e.target.value))}
+                />
                 <div className={styles.label}>Color unification</div>
                 <input type="range" />
                 <div className={styles.label}>Sprite type</div>
@@ -925,6 +1293,72 @@ export default function Home() {
                     <span className="material-symbols-rounded">
                       lock
                     </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.paint} style={{ display: activeRightPanel === 'paint' ? 'block' : 'none' }}>
+              <div className={styles.title}>Paint mode</div>
+              <div className={styles.options}>
+                <div className={styles.label}>Current color</div>
+                <div className={styles.colorSelector}>
+                  <div className={styles.color}>
+                    <input type="color" defaultValue="#000000" />
+                  </div>
+                  <div
+                    className={`${styles.picker} ${selectedTool === 'picker' ? styles.active : ''}`}
+                    onClick={() => handleToolSelect('picker')}
+                  >
+                    <span className="material-symbols-rounded">
+                      colorize
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.label}>Color palette</div>
+                <div className={styles.palette}>
+                  {colorPalette.map((color, index) => (
+                    <div
+                      key={index}
+                      className={styles.color}
+                      style={{ backgroundColor: color }}
+                      onClick={() => {
+                        const colorInput = document.querySelector('input[type="color"]') as HTMLInputElement;
+                        if (colorInput) {
+                          colorInput.value = rgbToHex(color);
+                        }
+                      }}
+                    ></div>
+                  ))}
+                </div>
+                <div className={styles.label}>Tools</div>
+                <div className={styles.tools}>
+                  <div
+                    className={`${styles.tool} ${selectedTool === 'brush' ? styles.active : ''}`}
+                    onClick={() => handleToolSelect('brush')}
+                  >
+                    <span className="material-symbols-rounded">
+                      brush
+                    </span>
+                    <div className={styles.text} style={{ marginRight: '5px' }}>Brush</div>
+                  </div>
+                  <div
+                    className={`${styles.tool} ${selectedTool === 'eraser' ? styles.active : ''}`}
+                    onClick={() => handleToolSelect('eraser')}
+                  >
+                    <span className="material-symbols-rounded" style={{ paddingTop: '1px' }}>
+                      ink_eraser
+                    </span>
+                    <div className={styles.text}>Eraser</div>
+                  </div>
+                  <div
+                    className={`${styles.tool} ${selectedTool === 'fill' ? styles.active : ''}`}
+                    onClick={() => handleToolSelect('fill')}
+                  >
+                    <span className="material-symbols-rounded">
+                      colors
+                    </span>
+                    <div className={styles.text} style={{ marginRight: '5px' }}>Fill</div>
                   </div>
                 </div>
               </div>
