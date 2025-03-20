@@ -3,7 +3,7 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import "./fonts.scss";
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, StrictMode } from 'react';
 
 export default function Home() {
   const server = process.env.NEXT_PUBLIC_SERVER?.toString();
@@ -26,8 +26,8 @@ export default function Home() {
   const [selectedModel, setSelectedModel] = useState('PixelCore');
   const [queueStatus, setQueueStatus] = useState<number[]>([0, 0, 0, 0, 0]);
   const [generationMode, setGenerationMode] = useState('simple');
-  const [guidanceScale, setGuidanceScale] = useState(10);
-  const [inferenceSteps, setInferenceSteps] = useState(70);
+  const [guidanceScale, setGuidanceScale] = useState(15);
+  const [inferenceSteps, setInferenceSteps] = useState(100);
   const [postProcessing, setPostProcessing] = useState(-32);
   const [showToast, setShowToast] = useState(false);
   const [popularPrompts, setPopularPrompts] = useState<string[]>([]);
@@ -46,13 +46,14 @@ export default function Home() {
     "Your moment is<br />almost here..."
   ];
   const [queueMessage, setQueueMessage] = useState(queueMessages[0]);
+  const [isStrictMode, setIsStrictMode] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageDataRef = useRef<ImageData | null>(null);
   const lastPositionRef = useRef<{ x: number; y: number } | null>(null);
   const [selectedTool, setSelectedTool] = useState<'brush' | 'eraser' | 'fill' | 'picker'>('brush');
   const [isDrawing, setIsDrawing] = useState(false);
-  const [brushSize] = useState(1);
+  const [brushSize, setBrushSize] = useState(1);
 
   const [editHistory, setEditHistory] = useState<string[]>(['/pictures/sprite.png']);
   const [editHistoryIndex, setEditHistoryIndex] = useState(0);
@@ -131,16 +132,31 @@ export default function Home() {
   const setPixel = (x: number, y: number) => {
     if (!imageDataRef.current || !canvasRef.current) return;
     const canvas = canvasRef.current;
-    const index = (y * canvas.width + x) * 4;
-    if (selectedTool === 'brush') {
-      const colorInput = document.querySelector('input[type="color"]') as HTMLInputElement;
-      const color = hexToRgb(colorInput?.value || '#000000');
-      imageDataRef.current.data[index] = color[0];
-      imageDataRef.current.data[index + 1] = color[1];
-      imageDataRef.current.data[index + 2] = color[2];
-      imageDataRef.current.data[index + 3] = 255;
-    } else if (selectedTool === 'eraser') {
-      imageDataRef.current.data[index + 3] = 0; // Прозрачность для ластика
+
+    // Определяем половину размера кисти
+    const halfSize = Math.floor(Math.sqrt(brushSize) / 2);
+
+    // Определяем границы области рисования
+    const minX = Math.max(0, x - halfSize);
+    const maxX = Math.min(canvas.width - 1, x + halfSize);
+    const minY = Math.max(0, y - halfSize);
+    const maxY = Math.min(canvas.height - 1, y + halfSize);
+
+    const colorInput = document.querySelector('input[type="color"]') as HTMLInputElement;
+    const color = hexToRgb(colorInput?.value || '#000000');
+
+    for (let py = minY; py <= maxY; py++) {
+      for (let px = minX; px <= maxX; px++) {
+        const index = (py * canvas.width + px) * 4;
+        if (selectedTool === 'brush') {
+          imageDataRef.current.data[index] = color[0];
+          imageDataRef.current.data[index + 1] = color[1];
+          imageDataRef.current.data[index + 2] = color[2];
+          imageDataRef.current.data[index + 3] = 255;
+        } else if (selectedTool === 'eraser') {
+          imageDataRef.current.data[index + 3] = 0;
+        }
+      }
     }
   };
 
@@ -193,12 +209,10 @@ export default function Home() {
       return;
     }
 
-    // Инициализация данных изображения
     imageDataRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
     setIsDrawing(true);
     lastPositionRef.current = { x, y };
 
-    // Устанавливаем начальный пиксель
     if (selectedTool === 'brush' || selectedTool === 'eraser') {
       setPixel(x, y);
       ctx.putImageData(imageDataRef.current, 0, 0);
@@ -227,6 +241,7 @@ export default function Home() {
 
     if (lastPositionRef.current) {
       const { x: lastX, y: lastY } = lastPositionRef.current;
+
       for (const { x: px, y: py } of bresenhamLine(lastX, lastY, x, y)) {
         setPixel(px, py);
       }
@@ -505,7 +520,7 @@ export default function Home() {
     if (isLoading) return;
 
     const textarea = textareaRef.current;
-    const description = prompt || (textarea?.value.trim() ?? '');
+    let description = prompt || (textarea?.value.trim() ?? '');
 
     if (!description) {
       return;
@@ -530,7 +545,7 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          description: description,
+          description: isStrictMode ? `solo alone solitary single, ${description}` : description,
           type: spriteType.replace('oid', ''),
           size: spriteSize,
           guidance_scale: guidanceScale,
@@ -685,6 +700,10 @@ export default function Home() {
   const handleModelSelect = (model: string) => {
     setSelectedModel(model);
     setIsDropdownOpen(false);
+  };
+
+  const getSizeClass = (size: number) => {
+    return brushSize === size ? styles.visible : styles.hidden;
   };
 
   const handleModeChange = (mode: string) => {
@@ -888,10 +907,11 @@ export default function Home() {
           <nav className={styles.nav}>
             <div className={styles.model}>
               <Image
-                src="/pictures/logo.png"
+                src="/pictures/logo.svg"
                 alt="Logo"
                 width={30}
                 height={30}
+                onClick={() => window.location.reload()}
               />
               <div
                 className={styles.button}
@@ -1223,6 +1243,7 @@ export default function Home() {
                   step={1}
                   onChange={(e) => setGuidanceScale(parseInt(e.target.value))}
                 />
+
                 <div className={styles.label}>Inference steps</div>
                 <input
                   type="range"
@@ -1232,6 +1253,7 @@ export default function Home() {
                   step={10}
                   onChange={(e) => setInferenceSteps(parseInt(e.target.value))}
                 />
+
                 <div className={styles.label}>Post-processing</div>
                 <input
                   type="range"
@@ -1241,8 +1263,22 @@ export default function Home() {
                   value={postProcessing}
                   onChange={(e) => setPostProcessing(parseInt(e.target.value))}
                 />
+
                 <div className={styles.label}>Color unification</div>
                 <input type="range" />
+
+                <div className={styles.label}>Strict mode</div>
+                <div className={styles.strict}>
+                  <input
+                    type="checkbox"
+                    checked={isStrictMode}
+                    onChange={(e) => setIsStrictMode(e.target.checked)}
+                  />
+                  <span className="material-symbols-rounded">
+                    help_center
+                  </span>
+                </div>
+
                 <div className={styles.label}>Sprite type</div>
                 <div className={styles.type}>
                   <div
@@ -1335,8 +1371,7 @@ export default function Home() {
                 <div className={styles.tools}>
                   <div
                     className={`${styles.tool} ${selectedTool === 'brush' ? styles.active : ''}`}
-                    onClick={() => handleToolSelect('brush')}
-                  >
+                    onClick={() => handleToolSelect('brush')}>
                     <span className="material-symbols-rounded">
                       brush
                     </span>
@@ -1344,8 +1379,7 @@ export default function Home() {
                   </div>
                   <div
                     className={`${styles.tool} ${selectedTool === 'eraser' ? styles.active : ''}`}
-                    onClick={() => handleToolSelect('eraser')}
-                  >
+                    onClick={() => handleToolSelect('eraser')}>
                     <span className="material-symbols-rounded" style={{ paddingTop: '1px' }}>
                       ink_eraser
                     </span>
@@ -1353,13 +1387,96 @@ export default function Home() {
                   </div>
                   <div
                     className={`${styles.tool} ${selectedTool === 'fill' ? styles.active : ''}`}
-                    onClick={() => handleToolSelect('fill')}
-                  >
+                    onClick={() => handleToolSelect('fill')}>
                     <span className="material-symbols-rounded">
                       colors
                     </span>
                     <div className={styles.text} style={{ marginRight: '5px' }}>Fill</div>
                   </div>
+                </div>
+                <div className={styles.label}>Brush size</div>
+                <div className={styles.brushSize}>
+                  <div className={styles.size}>
+                    <div className={styles.value1} style={{ display: brushSize === 1 ? 'block' : 'none' }}></div>
+
+                    <div className={styles.value4} style={{ display: brushSize === 4 ? 'grid' : 'none' }}>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                    </div>
+
+                    <div className={styles.value9} style={{ display: brushSize === 9 ? 'grid' : 'none' }}>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                    </div>
+
+                    <div className={styles.value16} style={{ display: brushSize === 16 ? 'grid' : 'none' }}>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                    </div>
+
+                    <div className={styles.value25} style={{ display: brushSize === 25 ? 'grid' : 'none' }}>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                      <div className={styles.pixel}></div>
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="4"
+                    step="1"
+                    value={brushSize === 1 ? 0 : brushSize === 4 ? 1 : brushSize === 9 ? 2 : brushSize === 16 ? 3 : 4}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      const sizes = [1, 4, 9, 16, 25];
+                      setBrushSize(sizes[value]);
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -1411,6 +1528,12 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/*
+          <div className={styles.decoration}>
+            <Image src="/pictures/decoration.svg" alt="Decoration" width={32} height={32} unoptimized />
+          </div>
+          */}
 
           <div className={styles.fade} style={{ display: isModelDropdownOpen ? 'block' : 'none' }}></div>
           <div className={styles.fade} style={{ display: isUserDropdownOpen ? 'block' : 'none' }}></div>
