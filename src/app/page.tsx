@@ -930,7 +930,7 @@ export default function Home() {
                       </span>
                     </div>
                     <div className={styles.text}>
-                      <div className={styles.title}>PixelDiffusion</div>
+                      <div className={styles.title}>PixelDiffusion<span className={styles.badge}>STABLE</span></div>
                       <div className={styles.subtitle}>Simple concept, 2-6 seconds</div>
                     </div>
                   </div>
@@ -943,7 +943,7 @@ export default function Home() {
                       </span>
                     </div>
                     <div className={styles.text}>
-                      <div className={styles.title}>PixelCore</div>
+                      <div className={styles.title}>PixelCore<span className={styles.badge}>BETA</span></div>
                       <div className={styles.subtitle}>High quality, 15-90 seconds</div>
                     </div>
                   </div>
