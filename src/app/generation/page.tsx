@@ -410,10 +410,10 @@ export default function Home() {
     fetchPopularPrompts();
   }, []);
 
-  const fetchRandomPrompt = async () => {
-    console.log('Отправка запроса на случайный промпт...');
+  const fetchRandomPrompt = async (spriteType: string) => {
+    console.log('Отправка запроса на случайный промпт...', spriteType);
     try {
-      const response = await fetch(`http://${server}/api/random-prompt`, {
+      const response = await fetch(`http://${server}/api/random-prompt?spriteType=${encodeURIComponent(spriteType)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -556,7 +556,7 @@ export default function Home() {
       handleInput();
     }
 
-    const prompt = await fetchRandomPrompt();
+    const prompt = await fetchRandomPrompt(spriteType);
     if (prompt) {
       setCurrentPrompt(prompt);
       setIsTypingAnimation(true);
