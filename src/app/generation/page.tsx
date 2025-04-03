@@ -4,10 +4,12 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import "./../fonts.scss";
 import { useRef, useState, useEffect, StrictMode } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const server = process.env.NEXT_PUBLIC_SERVER?.toString();
 
+  const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [imageSrc, setImageSrc] = useState('/pictures/sprite.png');
   const [images, setImages] = useState([
@@ -987,7 +989,7 @@ export default function Home() {
                 alt="Logo"
                 width={30}
                 height={30}
-                onClick={() => window.location.reload()}
+                onClick={() => router.push('/')}
               />
               <div
                 className={styles.button}
