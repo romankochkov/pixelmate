@@ -615,7 +615,24 @@ export default function Home() {
     setIsGenerated(false);
 
     try {
-      console.log('Отправка запроса на генерацию...');
+      const translateResponse = await fetch(`http://${server}/api/translate-prompt?prompt=${encodeURIComponent(description)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!translateResponse.ok) {
+        throw new Error(`Ошибка при переводе промпта: ${translateResponse.status}`);
+      }
+
+      const translateData = await translateResponse.json();
+      const translatedPrompt = translateData.prompt;
+
+      if (!translatedPrompt) {
+        throw new Error('Перевод не получен');
+      }
+
       const numImages = generationMode === 'advanced' ? 4 : 1;
       const response = await fetch(getApiUrl(), {
         method: 'POST',
@@ -623,7 +640,7 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          description: isStrictMode ? `solo alone solitary single, ${description}` : description,
+          description: isStrictMode ? `solo alone solitary single, ${translatedPrompt}` : translatedPrompt,
           type: spriteType.replace('oid', ''),
           size: spriteSize,
           guidance_scale: guidanceScale,
@@ -707,7 +724,7 @@ export default function Home() {
 
     } catch (error) {
       console.error('Ошибка при генерации:', error);
-      alert('Не удалось начать генерацию изображений');
+      alert('Не удалось начать генерацию изображений или произошла ошибка перевода');
       setIsLoading(false);
       setIsGenerated(false);
       setQueuePosition(null);
