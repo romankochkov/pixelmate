@@ -31,7 +31,7 @@ export default function Home() {
   const [queueStatus, setQueueStatus] = useState<number[]>([0, 0, 0, 0, 0]);
   const [generationMode, setGenerationMode] = useState('simple');
   const [guidanceScale, setGuidanceScale] = useState(15);
-  const [inferenceSteps, setInferenceSteps] = useState(100);
+  const [inferenceSteps, setInferenceSteps] = useState(70);
   const [postProcessing, setPostProcessing] = useState(-32);
   const [showToast, setShowToast] = useState(false);
   const [popularPrompts, setPopularPrompts] = useState<string[]>([]);
