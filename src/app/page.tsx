@@ -6,6 +6,35 @@ import "./fonts.scss";
 import { useRef, useState, useEffect, StrictMode } from 'react';
 
 export default function Generation() {
+  const [amount, setAmount] = useState(10);
+  const [activeItem, setActiveItem] = useState(10);
+
+  const fixedAmounts = [5, 10, 20, 50, 100];
+
+  // Обновление ссылки PayPal на основе суммы
+  const getPaypalUrl = (amount: number) => {
+    return `https://www.paypal.com/donate/?business=BGRACRK3T5R5L&amount=${amount}&no_recurring=0&item_name=Your+support+helps+us+grow+Pixelmate%2C+making+tools+accessible+to+all.%0AThank+you+for+believing+in+us.¤cy_code=USD`;
+  };
+
+  // Обработчик изменения input
+  const handleCustomAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = parseInt(e.target.value) || 1;
+    if (value > 100000) value = 100000;
+
+    setAmount(value);
+    setActiveItem(value);
+
+    if (fixedAmounts.includes(value)) {
+      setActiveItem(value);
+    } else {
+      setActiveItem(-1);
+    }
+  };
+
+  const handleFixedAmountClick = (value: number) => {
+    setAmount(value);
+    setActiveItem(value);
+  };
 
   return (
     <div className={styles.page}>
@@ -186,115 +215,123 @@ export default function Generation() {
             </section>
 
             <section className={styles.roadmap}>
-              <div className={styles.stages}>
-                <div className={styles.stage}>
-                  <div className={styles.checkpointActive} style={{ top: '7.5px', left: '-10.5px' }}>
-                    <span className="material-symbols-rounded">
-                      check
-                    </span>
+              <div className={styles.label}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M256 32l-74.8 0c-27.1 0-51.3 17.1-60.3 42.6L3.1 407.2C1.1 413 0 419.2 0 425.4C0 455.5 24.5 480 54.6 480L256 480l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 64 201.4 0c30.2 0 54.6-24.5 54.6-54.6c0-6.2-1.1-12.4-3.1-18.2L455.1 74.6C446 49.1 421.9 32 394.8 32L320 32l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64zm64 192l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32z" /></svg>
+                <span>ROADMAP</span>
+              </div>
+              <h2>Our route: from idea to reality</h2>
+              <p>Here you will see how we intend to innovate and move forward with a carefully crafted plan. We share the steps that will help us stay on the cutting edge of technology and ideas. Join us to see what discoveries await us!</p>
+              <div className={styles.center}>
+                <div className={styles.stages}>
+                  <div className={styles.stage}>
+                    <div className={styles.checkpointActive} style={{ top: '7.5px', left: '-10.5px' }}>
+                      <span className="material-symbols-rounded">
+                        check
+                      </span>
+                    </div>
+                    <div className={styles.line} style={{ marginTop: '18px' }}></div>
+                    <div className={styles.text} style={{ paddingTop: 0, paddingRight: '40px' }}>
+                      <div className={styles.title}>Research and Planning</div>
+                      <div className={styles.description}>
+                        At this stage, we conduct a deep analysis of the game development market, study the needs of developers for tools to create pixel art sprites, and define the unique features of our AI solution. Our focus is on building a highly skilled team dedicated to driving innovation in AI-driven game development. We also develop concepts for the generation algorithms and models, ensuring they align with the vision and expertise of our team.
+                      </div>
+                    </div>
+                    <Image
+                      src="/pictures/home/roadmap.svg"
+                      alt="Research"
+                      width={100}
+                      height={100}
+                      style={{ top: '20px', left: '-150px' }}
+                      unoptimized />
                   </div>
-                  <div className={styles.line} style={{ marginTop: '18px' }}></div>
-                  <div className={styles.text} style={{ paddingTop: 0, paddingRight: '40px' }}>
-                    <div className={styles.title}>Research and Planning</div>
-                    <div className={styles.description}>
-                      At this stage, we conduct a deep analysis of the game development market, study the needs of developers for tools to create pixel art sprites, and define the unique features of our AI solution. Our focus is on building a highly skilled team dedicated to driving innovation in AI-driven game development. We also develop concepts for the generation algorithms and models, ensuring they align with the vision and expertise of our team.
+
+                  <div className={styles.topLine}></div>
+
+                  <div className={styles.stage}>
+                    <Image
+                      src="/pictures/home/roadmap.svg"
+                      alt="Research"
+                      width={100}
+                      height={100}
+                      style={{ right: '-150px' }}
+                      unoptimized />
+                    <div className={styles.text} style={{ paddingLeft: '40px' }}>
+                      <div className={styles.title}>Prototyping and Testing</div>
+                      <div className={styles.description}>
+                        We create the first working prototype of the AI pixel sprite generator, which is capable of generating basic images based on user requests. The prototype undergoes internal testing to evaluate the quality of generation, speed, and user interface convenience. Improvements are made based on feedback.
+                      </div>
+                    </div>
+                    <div className={styles.line}></div>
+                    <div className={styles.checkpointActive} style={{ top: '47px', right: '-10.5px' }}>
+                      <span className="material-symbols-rounded">
+                        check
+                      </span>
                     </div>
                   </div>
-                  <Image
-                    src="/pictures/home/roadmap.svg"
-                    alt="Research"
-                    width={100}
-                    height={100}
-                    style={{ top: '20px', left: '-150px' }}
-                    unoptimized />
-                </div>
 
-                <div className={styles.topLine}></div>
+                  <div className={styles.bottomLine}></div>
 
-                <div className={styles.stage}>
-                  <Image
-                    src="/pictures/home/roadmap.svg"
-                    alt="Research"
-                    width={100}
-                    height={100}
-                    style={{ right: '-150px' }}
-                    unoptimized />
-                  <div className={styles.text} style={{ paddingLeft: '40px' }}>
-                    <div className={styles.title}>Prototyping and Testing</div>
-                    <div className={styles.description}>
-                      We create the first working prototype of the AI pixel sprite generator, which is capable of generating basic images based on user requests. The prototype undergoes internal testing to evaluate the quality of generation, speed, and user interface convenience. Improvements are made based on feedback.
+                  <div className={styles.stage}>
+                    <div className={styles.checkpointCurrent} style={{ top: '45px', left: '-13.5px' }}>
+                      <span className="material-symbols-rounded">
+                        star
+                      </span>
                     </div>
-                  </div>
-                  <div className={styles.line}></div>
-                  <div className={styles.checkpointActive} style={{ top: '47px', right: '-10.5px' }}>
-                    <span className="material-symbols-rounded">
-                      check
-                    </span>
-                  </div>
-                </div>
-
-                <div className={styles.bottomLine}></div>
-
-                <div className={styles.stage}>
-                  <div className={styles.checkpointCurrent} style={{ top: '45px', left: '-13.5px' }}>
-                    <span className="material-symbols-rounded">
-                      star
-                    </span>
-                  </div>
-                  <div className={styles.line} style={{ background: 'linear-gradient(to bottom, #3586FF 70px, #11244D 70px)' }}></div>
-                  <div className={styles.text} style={{ paddingRight: '40px' }}>
-                    <div className={styles.title}>Fundraising</div>
-                    <div className={styles.description}>
-                      At this stage, we prepare a presentation and business plan to attract investors. We hold meetings with venture capital funds, angel investors, and potential partners. Simultaneously, we organize the collection of regular donations through crowdfunding platforms and social media to attract additional funding from the game development community and enthusiasts. The goal is to secure resources for further development, marketing, and scaling of the project.
+                    <div className={styles.line} style={{ background: 'linear-gradient(to bottom, #3586FF 70px, #11244D 70px)' }}></div>
+                    <div className={styles.text} style={{ paddingRight: '40px' }}>
+                      <div className={styles.title}>Fundraising</div>
+                      <div className={styles.description}>
+                        At this stage, we prepare a presentation and business plan to attract investors. We hold meetings with venture capital funds, angel investors, and potential partners. Simultaneously, we organize the collection of regular donations through crowdfunding platforms and social media to attract additional funding from the game development community and enthusiasts. The goal is to secure resources for further development, marketing, and scaling of the project.
+                      </div>
                     </div>
+                    <Image
+                      src="/pictures/home/roadmap.svg"
+                      alt="Research"
+                      width={100}
+                      height={100}
+                      style={{ left: '-150px' }}
+                      unoptimized />
                   </div>
-                  <Image
-                    src="/pictures/home/roadmap.svg"
-                    alt="Research"
-                    width={100}
-                    height={100}
-                    style={{ left: '-150px' }}
-                    unoptimized />
-                </div>
 
-                <div className={styles.topLine} style={{ backgroundColor: '#11244D' }}></div>
+                  <div className={styles.topLine} style={{ backgroundColor: '#11244D' }}></div>
 
-                <div className={styles.stage}>
-                  <Image
-                    src="/pictures/home/roadmap.svg"
-                    alt="Research"
-                    width={100}
-                    height={100}
-                    style={{ right: '-150px' }}
-                    unoptimized />
-                  <div className={styles.text} style={{ paddingLeft: '40px' }}>
-                    <div className={styles.title}>MVP Development and Pilot Launch</div>
-                    <div className={styles.description}>
-                      After securing investments, we complete the development of a Minimum Viable Product (MVP) with key features, including sprite generation, style customization, and export to popular formats for game development tools. We also develop complex models for animation generation and create high-quality datasets through manual and automated drawing.
+                  <div className={styles.stage}>
+                    <Image
+                      src="/pictures/home/roadmap.svg"
+                      alt="Research"
+                      width={100}
+                      height={100}
+                      style={{ right: '-150px' }}
+                      unoptimized />
+                    <div className={styles.text} style={{ paddingLeft: '40px' }}>
+                      <div className={styles.title}>MVP Development and Pilot Launch</div>
+                      <div className={styles.description}>
+                        After securing investments, we complete the development of a Minimum Viable Product (MVP) with key features, including sprite generation, style customization, and export to popular formats for game development tools. We also develop complex models for animation generation and create high-quality datasets through manual and automated drawing.
+                      </div>
                     </div>
+                    <div className={styles.line} style={{ backgroundColor: '#11244D' }}></div>
+                    <div className={styles.checkpoint} style={{ top: '48px', right: '-10.5px' }}></div>
                   </div>
-                  <div className={styles.line} style={{ backgroundColor: '#11244D' }}></div>
-                  <div className={styles.checkpoint} style={{ top: '48px', right: '-10.5px' }}></div>
-                </div>
 
-                <div className={styles.bottomLine} style={{ backgroundColor: '#11244D' }}></div>
+                  <div className={styles.bottomLine} style={{ backgroundColor: '#11244D' }}></div>
 
-                <div className={styles.stage}>
-                  <div className={styles.checkpoint} style={{ top: '47px', left: '-10.5px' }}></div>
-                  <div className={styles.line} style={{ height: '55px', backgroundColor: '#11244D' }}></div>
-                  <div className={styles.text} style={{ paddingRight: '40px' }}>
-                    <div className={styles.title}>Scaling and Global Growth</div>
-                    <div className={styles.description}>
-                      In the final stage, we refine the product based on feedback, adding new features such as enhanced animation support and integration with game engines (Unity, Godot). We launch a large-scale marketing campaign, bring the product to the international market, and establish partnerships with major platforms and studios. We also introduce a subscription model or Freemium to ensure sustainable growth.
+                  <div className={styles.stage}>
+                    <div className={styles.checkpoint} style={{ top: '47px', left: '-10.5px' }}></div>
+                    <div className={styles.line} style={{ height: '55px', backgroundColor: '#11244D' }}></div>
+                    <div className={styles.text} style={{ paddingRight: '40px' }}>
+                      <div className={styles.title}>Scaling and Global Growth</div>
+                      <div className={styles.description}>
+                        In the final stage, we refine the product based on feedback, adding new features such as enhanced animation support and integration with game engines (Unity, Godot). We launch a large-scale marketing campaign, bring the product to the international market, and establish partnerships with major platforms and studios. We also introduce a subscription model or Freemium to ensure sustainable growth.
+                      </div>
                     </div>
+                    <Image
+                      src="/pictures/home/roadmap.svg"
+                      alt="Research"
+                      width={100}
+                      height={100}
+                      style={{ left: '-150px' }}
+                      unoptimized />
                   </div>
-                  <Image
-                    src="/pictures/home/roadmap.svg"
-                    alt="Research"
-                    width={100}
-                    height={100}
-                    style={{ left: '-150px' }}
-                    unoptimized />
                 </div>
               </div>
             </section>
@@ -303,12 +340,18 @@ export default function Generation() {
 
         <div className={styles.about}>
           <div className={styles.content}>
-            <Image
-              src="/pictures/home/about.jpg"
-              alt="About"
-              width={100}
-              height={100}
-              unoptimized />
+            <div className={styles.left}>
+              <div className={styles.label}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
+                <span>ABOUT US</span>
+              </div>
+              <Image
+                src="/pictures/home/about.jpg"
+                alt="About"
+                width={100}
+                height={100}
+                unoptimized />
+            </div>
             <div className={styles.text}>
               <h2>Millions of sprites<br></br><span>Millions of worlds</span></h2>
               <p>It all started with my love for the game Terraria, which captivated me with its charming pixel world, endless possibilities for exploration and construction. This game became a real inspiration for me - its bright colors, unique characters and dynamic worlds made me come back again and again. But over time, I noticed one thing: no matter how interesting Terraria is, it has its limits, and one day its possibilities run out.
@@ -317,6 +360,75 @@ export default function Generation() {
                 <br></br><br></br>
                 My path was full of experiments and learning. I believe this service solves the problem of finite games like Terraria, Stardew Valley, Starbound and allowing everyone to build their own unique worlds and stories. My goal is to give you the opportunity to unleash your potential in gamedev and pave new paths in the world of pixel art. Join me, and let's create endless adventures together!</p>
             </div>
+          </div>
+        </div>
+
+        <div className={styles.container}>
+          <div className={styles.content}>
+            <section className={styles.donate}>
+              <div className={styles.left}>
+                <div className={styles.text}>
+                  <div className={styles.label}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z" /></svg>
+                    <span>DONATION</span>
+                  </div>
+                  <h2>
+                    Support the Spark
+                    <span className="material-symbols-rounded">
+                      stars_2
+                    </span>
+                  </h2>
+                  <p>Your voluntary donations help fuel the creation of AI-generated pixel sprites that bring your creative ideas to life! Every contribution, no matter the size, supports us in enhancing and expanding this platform for creators like you. If you feel inspired, consider donating today—no pressure, just gratitude.</p>
+
+                  <div className={styles.items}>
+                    <div className={styles.custom}>
+                      <div className={styles.icon}><span>$</span></div>
+                      <input type="number" min="1" max="100000" value={amount} step="1" onChange={handleCustomAmountChange} />
+                    </div>
+                    {fixedAmounts.map((value) => (
+                      <div
+                        key={value}
+                        className={`${styles.item} ${activeItem === value ? styles.active : ''}`}
+                        onClick={() => handleFixedAmountClick(value)}>
+                        ${value}
+                      </div>
+                    ))}
+                  </div>
+                  <div className={styles.message}>
+                    <textarea placeholder="Leave your wish here (optional)"></textarea>
+                  </div>
+                  <div className={styles.buttons}>
+                    <div className={styles.button} onClick={() => { window.location.href = getPaypalUrl(amount); }}>Donate
+                      <span className="material-symbols-rounded">
+                        volunteer_activism
+                      </span>
+                    </div>
+                    <div className={styles.kickstarter}>Support us on
+                      <Image
+                        src="/pictures/home/kickstarter.svg"
+                        alt="Kickstarter"
+                        width={100}
+                        height={20}
+                        unoptimized />
+                    </div>
+                    <div className={styles.empty}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                        <path fill="#2c2e4e" fill-opacity="1" d="M0,32L0,128L36.9,128L36.9,224L73.8,224L73.8,288L110.8,288L110.8,320L147.7,320L147.7,128L184.6,128L184.6,0L221.5,0L221.5,288L258.5,288L258.5,64L295.4,64L295.4,160L332.3,160L332.3,128L369.2,128L369.2,96L406.2,96L406.2,256L443.1,256L443.1,64L480,64L480,160L516.9,160L516.9,224L553.8,224L553.8,64L590.8,64L590.8,224L627.7,224L627.7,128L664.6,128L664.6,288L701.5,288L701.5,128L738.5,128L738.5,64L775.4,64L775.4,128L812.3,128L812.3,160L849.2,160L849.2,0L886.2,0L886.2,160L923.1,160L923.1,32L960,32L960,224L996.9,224L996.9,224L1033.8,224L1033.8,32L1070.8,32L1070.8,64L1107.7,64L1107.7,288L1144.6,288L1144.6,256L1181.5,256L1181.5,192L1218.5,192L1218.5,32L1255.4,32L1255.4,96L1292.3,96L1292.3,192L1329.2,192L1329.2,320L1366.2,320L1366.2,256L1403.1,256L1403.1,160L1440,160L1440,320L1403.1,320L1403.1,320L1366.2,320L1366.2,320L1329.2,320L1329.2,320L1292.3,320L1292.3,320L1255.4,320L1255.4,320L1218.5,320L1218.5,320L1181.5,320L1181.5,320L1144.6,320L1144.6,320L1107.7,320L1107.7,320L1070.8,320L1070.8,320L1033.8,320L1033.8,320L996.9,320L996.9,320L960,320L960,320L923.1,320L923.1,320L886.2,320L886.2,320L849.2,320L849.2,320L812.3,320L812.3,320L775.4,320L775.4,320L738.5,320L738.5,320L701.5,320L701.5,320L664.6,320L664.6,320L627.7,320L627.7,320L590.8,320L590.8,320L553.8,320L553.8,320L516.9,320L516.9,320L480,320L480,320L443.1,320L443.1,320L406.2,320L406.2,320L369.2,320L369.2,320L332.3,320L332.3,320L295.4,320L295.4,320L258.5,320L258.5,320L221.5,320L221.5,320L184.6,320L184.6,320L147.7,320L147.7,320L110.8,320L110.8,320L73.8,320L73.8,320L36.9,320L36.9,320L0,320L0,320Z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.right}>
+                <Image
+                  src="/pictures/home/donate.svg"
+                  alt="Donation"
+                  width={100}
+                  height={100}
+                  unoptimized />
+              </div>
+            </section>
           </div>
         </div>
       </main>
