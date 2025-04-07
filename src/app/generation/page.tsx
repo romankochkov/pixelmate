@@ -1246,6 +1246,7 @@ export default function Home() {
                     ref={textareaRef}
                     placeholder={animatedPlaceholder}
                     rows={1}
+                    maxLength={180}
                     spellCheck={false}
                     onInput={handleInput}
                     onKeyDown={handleKeyDown}
