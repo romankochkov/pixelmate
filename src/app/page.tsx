@@ -41,13 +41,12 @@ export default function Generation() {
       <main className={styles.main}>
         <div className={styles.container}>
           <nav className={styles.nav}>
-            <div className={styles.logo}>
+            <div className={styles.logo} onClick={() => window.location.reload()}>
               <Image
                 src="/pictures/logo.svg"
                 alt="Logo"
                 width={30}
-                height={30}
-                onClick={() => window.location.reload()} />
+                height={30} />
               <span>pixelmate</span>
             </div>
 
@@ -342,7 +341,7 @@ export default function Generation() {
           <div className={styles.content}>
             <div className={styles.left}>
               <div className={styles.label}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z" /></svg>
                 <span>ABOUT US</span>
               </div>
               <Image
@@ -432,6 +431,67 @@ export default function Generation() {
           </div>
         </div>
       </main>
+      <footer>
+        <div className={styles.content}>
+          <div className={styles.surface}>
+            <div className={styles.logo}>
+              <Image
+                src="/pictures/logo.svg"
+                alt="Logo"
+                width={30}
+                height={30} />
+              <span>pixelmate</span>
+            </div>
+            <div className={styles.contact}>
+              <div className={styles.label}>Email</div>
+              <div className={styles.value} style={{ marginBottom: '8px' }}>pixelmateai@gmail.com</div>
+              <div className={styles.label}>Phone (SMS only)</div>
+              <div className={styles.value}>+1 (904) 671-6347</div>
+            </div>
+            <div className={styles.copyright}>© 2023 Pixelmate. All rights reserved.</div>
+          </div>
+          <div className={styles.links}>
+            <div className={styles.column}>
+              <p className={styles.title}>People</p>
+              <p className={styles.link}><a>Acknowledgments</a></p>
+              <p className={styles.link}><a href="https://discord.gg/hphK6FN8KT" target="_blank">Community</a></p>
+              <p className={`${styles.link} ${styles.disabled}`}><a>Partners</a></p>
+            </div>
+            <div className={styles.column}>
+              <p className={styles.title}>Project</p>
+              <p className={styles.link}><a>Kickstarter</a></p>
+              <p className={`${styles.link} ${styles.disabled}`}><a>Contact</a></p>
+              <p className={`${styles.link} ${styles.disabled}`}><a>Pricing</a></p>
+            </div>
+            <div className={styles.column}>
+              <p className={styles.title}>Information</p>
+              <p className={`${styles.link} ${styles.disabled}`}><a>FAQ & Help</a></p>
+              <p className={styles.link}><a>Privacy policy</a></p>
+              <p className={styles.link}><a>Terms of use</a></p>
+            </div>
+          </div>
+          <div className={styles.social}>
+            <div className={styles.column}>
+              <p className={styles.title}>Social Media</p>
+              <div className={styles.buttons}>
+                <div className={styles.linkedin} onClick={() => window.open('https://www.linkedin.com/company/pixelmateai', '_blank')}>
+                  <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M25.5626 25.5624H21.1176V18.6C21.1176 16.94 21.0876 14.8025 18.8051 14.8025C16.4901 14.8025 16.1351 16.6125 16.1351 18.4775V25.5624H11.6901V11.245H15.9576V13.2025H16.0176C16.8876 11.7175 18.5076 10.8275 20.2276 10.89C24.7326 10.89 25.5651 13.8525 25.5651 17.71L25.5626 25.5599V25.5624ZM6.67506 9.2875C5.99225 9.28422 5.3383 9.01169 4.85523 8.5291C4.37217 8.0465 4.099 7.39282 4.09506 6.71001C4.09506 5.29502 5.26006 4.13002 6.67506 4.13002C8.09006 4.13002 9.25256 5.29502 9.25506 6.71001C9.25506 8.12501 8.09006 9.2875 6.67506 9.2875ZM8.89756 25.5624H4.44756V11.245H8.89756V25.5624ZM27.7751 3.71579e-05H2.21256C1.63294 -0.0033294 1.0754 0.222185 0.661119 0.627575C0.246833 1.03297 0.0092727 1.58547 6.10352e-05 2.16503V27.8349C0.0092727 28.4145 0.246833 28.967 0.661119 29.3724C1.0754 29.7778 1.63294 30.0033 2.21256 29.9999H27.7776C28.3585 30.0046 28.9179 29.7799 29.334 29.3745C29.7502 28.9691 29.9895 28.4158 30.0001 27.8349V2.16253C29.9895 1.5821 29.75 1.02935 29.3337 0.624757C28.9174 0.220158 28.3581 -0.00349562 27.7776 0.00253697L27.7751 3.71579e-05Z" fill="#3586FF" />
+                  </svg>
+                </div>
+                <div className={styles.kickstarter}>
+                  <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M5.00006 0C2.23864 0 6.10352e-05 2.23858 6.10352e-05 5V25C6.10352e-05 27.7614 2.23864 30 5.00006 30H25.0001C27.7615 30 30.0001 27.7614 30.0001 25V5C30.0001 2.23858 27.7615 0 25.0001 0H5.00006ZM22.5421 24.6562C21.0438 25.8251 18.8819 25.5583 17.7129 24.06L15.4167 21.1169C14.6306 20.1094 13.0145 20.6652 13.0145 21.9431C13.0145 23.8441 11.4741 25.3847 9.57382 25.3847C7.67353 25.3847 6.13318 23.8441 6.13318 21.9431V8.05675C6.13318 6.15574 7.67353 4.61539 9.57382 4.61539C11.4741 4.61539 13.0145 6.15574 13.0145 8.05675C13.0145 9.03883 14.2662 9.45354 14.8526 8.66572L16.7104 6.16965C17.8451 4.64512 20.0006 4.3289 21.525 5.46303C23.0494 6.59769 23.3658 8.75308 22.2316 10.2784L21.3127 11.5129C19.9687 13.3184 19.9968 15.7993 21.3813 17.5739L23.1389 19.8269C24.3078 21.3252 24.0409 23.4871 22.5421 24.6562Z" fill="#3586FF" />
+                  </svg>
+                </div>
+                <div className={styles.discord} onClick={() => window.open('https://discord.gg/hphK6FN8KT', '_blank')}></div>
+                <div className={styles.x}></div>
+              </div>
+            </div>
+          </div>
+          <div className={styles.copyrightMobile}>© 2023 Pixelmate. All rights reserved.</div>
+        </div>
+      </footer>
     </div>
   );
 }
