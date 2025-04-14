@@ -724,7 +724,7 @@ export default function Home() {
 
     } catch (error) {
       console.error('Ошибка при генерации:', error);
-      alert('Не удалось начать генерацию изображений или произошла ошибка перевода');
+      alert('An error occurred, generation may not be available at the moment');
       setIsLoading(false);
       setIsGenerated(false);
       setQueuePosition(null);
