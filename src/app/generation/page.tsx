@@ -413,7 +413,7 @@ export default function Home() {
   const fetchRandomPrompt = async (spriteType: string) => {
     console.log('Отправка запроса на случайный промпт...', spriteType);
     try {
-      const response = await fetch(`http://${server}/api/random-prompt?spriteType=${encodeURIComponent(spriteType)}`, {
+      const response = await fetch(`/api/random-prompt?spriteType=${encodeURIComponent(spriteType)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -525,8 +525,8 @@ export default function Home() {
 
   const getApiUrl = () => {
     return selectedModel === 'PixelCore'
-      ? `http://${server}/api/generation/pixelcore`
-      : `http://${server}/api/generation/pixeldiffusion`;
+      ? `/api/generation/pixelcore`
+      : `/api/generation/pixeldiffusion`;
   };
 
   const handleInput = () => {
@@ -568,7 +568,7 @@ export default function Home() {
 
   const fetchQueuePosition = async (taskId: string) => {
     try {
-      const response = await fetch(`http://${server}/api/task/${taskId}/position`, {
+      const response = await fetch(`/api/task/${taskId}/position`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -615,7 +615,7 @@ export default function Home() {
     setIsGenerated(false);
 
     try {
-      const translateResponse = await fetch(`http://${server}/api/translate-prompt?prompt=${encodeURIComponent(description)}`, {
+      const translateResponse = await fetch(`/api/translate-prompt?prompt=${encodeURIComponent(description)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -665,7 +665,7 @@ export default function Home() {
       const checkStatus = setInterval(async () => {
         try {
           console.log(`Опрос статуса задачи ${taskId}...`);
-          const statusResponse = await fetch(`http://${server}/api/task/${taskId}`);
+          const statusResponse = await fetch(`/api/task/${taskId}`);
           if (!statusResponse.ok) {
             throw new Error(`Ошибка при запросе статуса: ${statusResponse.status}`);
           }
