@@ -375,7 +375,7 @@ export default function Home() {
 
   const fetchPopularPrompts = async () => {
     try {
-      const response = await fetch(`http://${server}/api/popular-prompts`, {
+      const response = await fetch(`/api/popular-prompts`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -472,7 +472,7 @@ export default function Home() {
 
   const fetchQueueStatus = async () => {
     try {
-      const response = await fetch(`http://${server}/api/status`, {
+      const response = await fetch(`/api/status`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
