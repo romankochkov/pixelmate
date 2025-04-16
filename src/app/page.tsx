@@ -38,6 +38,7 @@ export default function Generation() {
 
   return (
     <div className={styles.page}>
+      <div className={styles.globalWarning}>The website is still under construction. Sorry for the inconvenience</div>
       <main className={styles.main}>
         <div className={styles.container}>
           <nav className={styles.nav}>
