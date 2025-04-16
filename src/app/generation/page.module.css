@@ -1039,6 +1039,7 @@
 }
 
 .page .main .container .content .additional .options {
+  position: relative;
   background-color: #13182E;
   border-radius: 6px;
   padding-top: 14px;
@@ -1079,14 +1080,32 @@
   border-radius: 2px;
 }
 
+.page .main .container .content .additional .options .mods {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  display: flex;
+  justify-content: space-around;
+  left: 0px;
+  top: calc(100% + 15px);
+}
+
+.page .main .container .content .additional .options .mods .switch {
+  width: 44%;
+  position: relative;
+  background-color: rgb(19, 24, 46);
+  border-radius: 6px;
+  padding-top: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 6px;
+}
+
 .page .main .container .content .additional .options .strict {
   width: 100%;
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-  margin-top: -3px;
-  margin-bottom: 20px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .page .main .container .content .additional .options .strict input[type=checkbox] {
@@ -1102,6 +1121,7 @@
   position: relative;
   border-radius: .2em;
   cursor: pointer;
+  transition: .2s ease;
 }
 
 .page .main .container .content .additional .options .strict input[type=checkbox]::before {
@@ -1118,26 +1138,51 @@
   transition: .2s ease;
 }
 
-.page .main .container .content .additional .options .strict input[type=checkbox]:checked::before {
+.page .main .container .content .additional .options .strict input[type=checkbox]:checked {
   background-color: #3586FF;
+}
+
+.page .main .container .content .additional .options .strict input[type=checkbox]:checked::before {
+  background-color: #ffffff;
   left: calc(100% - calc(12px/2 + 6px));
 }
 
 .page .main .container .content .additional .options .strict span {
-  color: rgba(53, 134, 255, 0.1);
-  font-size: 20px;
+  position: relative;
+  color: rgba(53, 134, 255, 0.2);
+  font-size: 24px;
   font-variation-settings: 'FILL' 1;
+  margin-left: 4px;
   display: flex;
+  margin-top: -1px;
   cursor: pointer;
+  transition: 0.1s ease;
+}
+
+.page .main .container .content .additional .options .strict span:hover {
+  color: #3586FF;
 }
 
 .page .main .container .content .additional .options .type {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
   gap: 8px;
   margin-top: -3px;
   margin-bottom: 15px;
+}
+
+.page .main .container .content .additional .options .type .smartIcon {
+  position: absolute;
+  top: 1px;
+  right: calc(100% + 25px);
+  animation: pulse .8s ease-in-out infinite;
+  user-select: none;
+}
+
+.page .main .container .content .additional .options .type .smartIcon span {
+  color: rgba(53, 134, 255, 0.8);
 }
 
 .page .main .container .content .additional .options .type .tab {
@@ -1158,12 +1203,24 @@
 }
 
 .page .main .container .content .additional .options .size {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 100%;
   gap: 8px;
   margin-top: -3px;
-  margin-bottom: 15px;
+}
+
+.page .main .container .content .additional .options .size .smartIcon {
+  position: absolute;
+  top: 1px;
+  right: calc(100% + 25px);
+  animation: pulse .8s ease-in-out infinite;
+  user-select: none;
+}
+
+.page .main .container .content .additional .options .size .smartIcon span {
+  color: rgba(53, 134, 255, 0.8);
 }
 
 .page .main .container .content .additional .options .size .tab {
@@ -1183,12 +1240,52 @@
   background-color: #3586FF;
 }
 
+.page .main .container .content .additional .options .orientation {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  gap: 8px;
+  margin-top: -3px;
+  margin-bottom: 15px;
+}
+
+.page .main .container .content .additional .options .orientation .smartIcon {
+  position: absolute;
+  top: 1px;
+  right: calc(100% + 25px);
+  animation: pulse .8s ease-in-out infinite;
+  user-select: none;
+}
+
+.page .main .container .content .additional .options .orientation .smartIcon span {
+  color: rgba(53, 134, 255, 0.8);
+}
+
+.page .main .container .content .additional .options .orientation .tab {
+  background-color: rgba(53, 134, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  font-family: 'Mate';
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  cursor: pointer;
+}
+
+.page .main .container .content .additional .options .orientation .active {
+  background-color: #3586FF;
+}
+
 .page .main .container .content .additional .options .mode {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   width: 100%;
   gap: 8px;
-  margin-top: -3px;
+  margin-bottom: 15px;
+  user-select: none;
 }
 
 .page .main .container .content .additional .options .mode .tab {
@@ -1244,6 +1341,7 @@
 }
 
 .page .main .container .content .paint .options {
+  position: relative;
   background-color: #13182E;
   border-radius: 6px;
   padding-top: 14px;

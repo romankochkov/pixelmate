@@ -23,6 +23,7 @@ export default function Home() {
   const [history, setHistory] = useState<string[]>([]);
   const [activeRightPanel, setActiveRightPanel] = useState<string | null>(null);
   const [spriteType, setSpriteType] = useState('humanoid');
+  const [spriteOrientation, setSpriteOrientation] = useState('normal');
   const [spriteSize, setSpriteSize] = useState('large');
   const [isTypingAnimation, setIsTypingAnimation] = useState(false);
   const [currentPrompt, setCurrentPrompt] = useState("");
@@ -51,6 +52,7 @@ export default function Home() {
   ];
   const [queueMessage, setQueueMessage] = useState(queueMessages[0]);
   const [isStrictMode, setIsStrictMode] = useState(false);
+  const [isSmartMode, setIsSmartMode] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageDataRef = useRef<ImageData | null>(null);
@@ -375,7 +377,7 @@ export default function Home() {
 
   const fetchPopularPrompts = async () => {
     try {
-      const response = await fetch(`/api/popular-prompts`, {
+      const response = await fetch(`https://pixelmate.club/api/popular-prompts`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -413,7 +415,7 @@ export default function Home() {
   const fetchRandomPrompt = async (spriteType: string) => {
     console.log('Отправка запроса на случайный промпт...', spriteType);
     try {
-      const response = await fetch(`/api/random-prompt?spriteType=${encodeURIComponent(spriteType)}`, {
+      const response = await fetch(`https://pixelmate.club/api/random-prompt?spriteType=${encodeURIComponent(spriteType)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -472,7 +474,7 @@ export default function Home() {
 
   const fetchQueueStatus = async () => {
     try {
-      const response = await fetch(`/api/status`, {
+      const response = await fetch(`https://pixelmate.club/api/status`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -525,8 +527,8 @@ export default function Home() {
 
   const getApiUrl = () => {
     return selectedModel === 'PixelCore'
-      ? `/api/generation/pixelcore`
-      : `/api/generation/pixeldiffusion`;
+      ? `https://pixelmate.club/api/generation/pixelcore`
+      : `https://pixelmate.club/api/generation/pixeldiffusion`;
   };
 
   const handleInput = () => {
@@ -568,7 +570,7 @@ export default function Home() {
 
   const fetchQueuePosition = async (taskId: string) => {
     try {
-      const response = await fetch(`/api/task/${taskId}/position`, {
+      const response = await fetch(`https://pixelmate.club/api/task/${taskId}/position`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -615,7 +617,7 @@ export default function Home() {
     setIsGenerated(false);
 
     try {
-      const translateResponse = await fetch(`/api/translate-prompt?prompt=${encodeURIComponent(description)}`, {
+      const translateResponse = await fetch(`https://pixelmate.club/api/translate-prompt?prompt=${encodeURIComponent(description)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -627,10 +629,47 @@ export default function Home() {
       }
 
       const translateData = await translateResponse.json();
-      const translatedPrompt = translateData.prompt;
+      let translatedPrompt = translateData.prompt;
 
       if (!translatedPrompt) {
         throw new Error('Перевод не получен');
+      }
+
+      let finalSpriteOrientation = spriteOrientation;
+      let finalSpriteType = spriteType;
+      let finalSpriteSize = spriteSize;
+
+      if (isSmartMode) {
+        try {
+          const smartResponse = await fetch(`https://pixelmate.club/api/smart-prompt?prompt=${encodeURIComponent(translatedPrompt)}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!smartResponse.ok) {
+            throw new Error('Ошибка при получении параметров smart-промпта');
+          }
+
+          const smartData = await smartResponse.json();
+          if (smartData.orientation && ['normal', 'horizontal', 'vertical'].includes(smartData.orientation)) {
+            finalSpriteOrientation = smartData.orientation;
+            setSpriteOrientation(smartData.orientation);
+          }
+          if (smartData.size && ['small', 'medium', 'large'].includes(smartData.size)) {
+            finalSpriteSize = smartData.size;
+            setSpriteSize(smartData.size);
+          }
+          if (smartData.type && ['humanoid', 'creature', 'object'].includes(smartData.type)) {
+            finalSpriteType = smartData.type;
+            setSpriteType(smartData.type);
+          }
+
+          console.log(smartData);
+        } catch (error) {
+          console.error('Ошибка при запросе', error);
+        }
       }
 
       const numImages = generationMode === 'advanced' ? 4 : 1;
@@ -641,8 +680,9 @@ export default function Home() {
         },
         body: JSON.stringify({
           description: isStrictMode ? `solo alone solitary single, ${translatedPrompt}` : translatedPrompt,
-          type: spriteType.replace('oid', ''),
-          size: spriteSize,
+          type: finalSpriteType.replace('oid', ''),
+          orientation: finalSpriteOrientation,
+          size: finalSpriteSize,
           guidance_scale: guidanceScale,
           inference_steps: inferenceSteps,
           num_colors: Math.abs(postProcessing),
@@ -665,13 +705,12 @@ export default function Home() {
       const checkStatus = setInterval(async () => {
         try {
           console.log(`Опрос статуса задачи ${taskId}...`);
-          const statusResponse = await fetch(`/api/task/${taskId}`);
+          const statusResponse = await fetch(`https://pixelmate.club/api/task/${taskId}`);
           if (!statusResponse.ok) {
             throw new Error(`Ошибка при запросе статуса: ${statusResponse.status}`);
           }
 
           const statusData = await statusResponse.json();
-          console.log('Ответ от /api/task:', statusData);
 
           if (statusData.images) {
             console.log('Изображения получены:', statusData.images);
@@ -716,7 +755,7 @@ export default function Home() {
           clearInterval(positionInterval);
           setQueuePosition(null);
           setQueueTotal(null);
-          alert('Ошибка при получении изображений');
+          alert('An unexpected error occurred');
           setIsLoading(false);
           setIsGenerated(false);
         }
@@ -786,6 +825,10 @@ export default function Home() {
 
   const handleSpriteSizeChange = (size: string) => {
     setSpriteSize(size);
+  };
+
+  const handleSpriteOrientationChange = (size: string) => {
+    setSpriteOrientation(size);
   };
 
   const toggleDropdown = () => {
@@ -1331,6 +1374,22 @@ export default function Home() {
               style={{ display: activeRightPanel === 'additional' ? 'block' : 'none' }}>
               <div className={styles.title}>Additional options</div>
               <div className={styles.options}>
+                <div className={styles.label}>Generation mode</div>
+                <div className={styles.mode} style={{ pointerEvents: isLoading ? 'none' : 'auto' }}>
+                  <div
+                    className={`${styles.tab} ${generationMode === 'simple' ? styles.active : ''}`}
+                    onClick={() => handleModeChange('simple')}>
+                    Single
+                  </div>
+                  <div
+                    className={`${styles.tab} ${generationMode === 'advanced' ? styles.active : ''}`}
+                    onClick={() => handleModeChange('advanced')} style={{ paddingLeft: '10px' }}>
+                    Multiple
+                    <span className="material-symbols-rounded">
+                      lock
+                    </span>
+                  </div>
+                </div>
                 <div className={styles.label}>Guidance scale</div>
                 <input
                   type="range"
@@ -1364,20 +1423,13 @@ export default function Home() {
                 <div className={styles.label}>Color unification</div>
                 <input type="range" />
 
-                <div className={styles.label}>Strict mode</div>
-                <div className={styles.strict}>
-                  <input
-                    type="checkbox"
-                    checked={isStrictMode}
-                    onChange={(e) => setIsStrictMode(e.target.checked)}
-                  />
-                  <span className="material-symbols-rounded">
-                    help_center
-                  </span>
-                </div>
-
                 <div className={styles.label}>Sprite type</div>
                 <div className={styles.type}>
+                  <div className={styles.smartIcon} style={{ display: (isSmartMode && isLoading && queuePosition === null) ? 'block' : 'none' }}>
+                    <span className="material-symbols-rounded">
+                      network_intelligence
+                    </span>
+                  </div>
                   <div
                     className={`${styles.tab} ${spriteType === 'humanoid' ? styles.active : ''}`}
                     onClick={() => handleSpriteTypeChange('humanoid')}>
@@ -1394,8 +1446,39 @@ export default function Home() {
                     Object
                   </div>
                 </div>
+
+                <div className={styles.label}>Sprite orientation</div>
+                <div className={styles.orientation}>
+                  <div className={styles.smartIcon} style={{ display: (isSmartMode && isLoading && queuePosition === null) ? 'block' : 'none' }}>
+                    <span className="material-symbols-rounded">
+                      network_intelligence
+                    </span>
+                  </div>
+                  <div
+                    className={`${styles.tab} ${spriteOrientation === 'normal' ? styles.active : ''}`}
+                    onClick={() => handleSpriteOrientationChange('normal')}>
+                    Normal
+                  </div>
+                  <div
+                    className={`${styles.tab} ${spriteOrientation === 'horizontal' ? styles.active : ''}`}
+                    onClick={() => handleSpriteOrientationChange('horizontal')}>
+                    Horizontal
+                  </div>
+                  <div
+                    className={`${styles.tab} ${spriteOrientation === 'vertical' ? styles.active : ''}`}
+                    onClick={() => handleSpriteOrientationChange('vertical')}>
+                    Vectical
+                  </div>
+                </div>
+
+
                 <div className={styles.label}>Sprite size</div>
                 <div className={styles.size}>
+                  <div className={styles.smartIcon} style={{ display: (isSmartMode && isLoading && queuePosition === null) ? 'block' : 'none' }}>
+                    <span className="material-symbols-rounded">
+                      network_intelligence
+                    </span>
+                  </div>
                   <div
                     className={`${styles.tab} ${spriteSize === 'small' ? styles.active : ''}`}
                     onClick={() => handleSpriteSizeChange('small')}>
@@ -1412,20 +1495,34 @@ export default function Home() {
                     Large
                   </div>
                 </div>
-                <div className={styles.label}>Generation mode</div>
-                <div className={styles.mode}>
-                  <div
-                    className={`${styles.tab} ${generationMode === 'simple' ? styles.active : ''}`}
-                    onClick={() => handleModeChange('simple')}>
-                    Simple
+
+                <div className={styles.mods}>
+                  <div className={styles.switch}>
+                    <div className={styles.label}>Smart mode</div>
+                    <div className={styles.strict}>
+                      <input
+                        type="checkbox"
+                        checked={isSmartMode}
+                        onChange={(e) => setIsSmartMode(e.target.checked)}
+                      />
+                      <span className="material-symbols-rounded">
+                        help_center
+                      </span>
+                    </div>
                   </div>
-                  <div
-                    className={`${styles.tab} ${generationMode === 'advanced' ? styles.active : ''}`}
-                    onClick={() => handleModeChange('advanced')} style={{ paddingLeft: '10px' }}>
-                    Advanced
-                    <span className="material-symbols-rounded">
-                      lock
-                    </span>
+
+                  <div className={styles.switch}>
+                    <div className={styles.label}>Strict mode</div>
+                    <div className={styles.strict}>
+                      <input
+                        type="checkbox"
+                        checked={isStrictMode}
+                        onChange={(e) => setIsStrictMode(e.target.checked)}
+                      />
+                      <span className="material-symbols-rounded">
+                        help_center
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
