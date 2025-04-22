@@ -1729,9 +1729,9 @@ export default function Home() {
           </div>
           */}
 
-          <div className={styles.fade} style={{ display: isModelDropdownOpen ? 'block' : 'none' }}></div>
-          <div className={styles.fade} style={{ display: isUserDropdownOpen ? 'block' : 'none' }}></div>
-          <div className={styles.fade} style={{ display: isNotificationDropdownOpen ? 'block' : 'none' }}></div>
+          <div className={styles.fade} style={{ display: isModelDropdownOpen ? 'block' : 'none' }} onClick={() => setIsDropdownOpen(false)}></div>
+          <div className={styles.fade} style={{ display: isUserDropdownOpen ? 'block' : 'none' }} onClick={() => setIsUserDropdownOpen(false)}></div>
+          <div className={styles.fade} style={{ display: isNotificationDropdownOpen ? 'block' : 'none' }} onClick={() => setIsNotificationDropdownOpen(false)}></div>
         </div>
       </main>
     </div>

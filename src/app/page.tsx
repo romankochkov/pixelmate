@@ -88,7 +88,14 @@ export default function Generation() {
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M176 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40c-35.3 0-64 28.7-64 64l-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0 0 56-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0 0 56-40 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l40 0c0 35.3 28.7 64 64 64l0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40 56 0 0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40 56 0 0 40c0 13.3 10.7 24 24 24s24-10.7 24-24l0-40c35.3 0 64-28.7 64-64l40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0 0-56 40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0 0-56 40 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-40 0c0-35.3-28.7-64-64-64l0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40-56 0 0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40-56 0 0-40zM160 128l192 0c17.7 0 32 14.3 32 32l0 192c0 17.7-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32l0-192c0-17.7 14.3-32 32-32zm192 32l-192 0 0 192 192 0 0-192z" /></svg>
                     <span>SPRITE FORMATION</span>
                   </div>
-                  <h2>Generate and customize<br></br>sprites with perfect precision</h2>
+                  <h2>Generate and customize <br></br>sprites with perfect precision</h2>
+                  <Image
+                    className={styles.imageMobile}
+                    src="/pictures/home/generation.svg"
+                    alt="Demo"
+                    width={403}
+                    height={461}
+                    unoptimized />
                   <p>Our advanced AI tool gives you full control, from basic design to fine-tuning details. Choose a style, adjust colors, add effects, and create pixel-perfect sprites for your games. Bring your vision to life with precision and explore customizable options.</p>
 
                   <div className={styles.items}>
@@ -160,7 +167,15 @@ export default function Generation() {
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z" /></svg>
                     <span>GAME DEVELOPMENT</span>
                   </div>
-                  <h2>Sprite integration into<br></br>newest game engines</h2>
+                  <h2>Sprite integration into <br></br>newest game engines</h2>
+                  <div className={styles.frameMobile}>
+                    <Image
+                      src="/pictures/home/sprite.png"
+                      alt="Sprite"
+                      width={100}
+                      height={100}
+                      unoptimized />
+                  </div>
                   <p>Our AI-generated pixel sprites seamlessly integrate into Unity, Godot, Construct and Unreal Engine. Upload the files, set up animations, and you’re done! Save time and build unique games.</p>
                   <div className={styles.items}>
                     <div className={styles.item}>
@@ -219,7 +234,7 @@ export default function Generation() {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M256 32l-74.8 0c-27.1 0-51.3 17.1-60.3 42.6L3.1 407.2C1.1 413 0 419.2 0 425.4C0 455.5 24.5 480 54.6 480L256 480l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 64 201.4 0c30.2 0 54.6-24.5 54.6-54.6c0-6.2-1.1-12.4-3.1-18.2L455.1 74.6C446 49.1 421.9 32 394.8 32L320 32l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64zm64 192l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32z" /></svg>
                 <span>ROADMAP</span>
               </div>
-              <h2>Our route: from idea to reality</h2>
+              <h2>Our route:<br/>from idea to reality</h2>
               <p>Here you will see how we intend to innovate and move forward with a carefully crafted plan. We share the steps that will help us stay on the cutting edge of technology and ideas. Join us to see what discoveries await us!</p>
               <div className={styles.center}>
                 <div className={styles.stages}>

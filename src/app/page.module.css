@@ -288,6 +288,10 @@
   font-weight: 700;
 }
 
+.page .main .container .content .generation .imageMobile {
+  display: none;
+}
+
 .page .main .container .content .generation .left p {
   color: rgba(255, 255, 255, 0.6);
   font-family: 'Mate';
@@ -430,6 +434,10 @@
   font-weight: 700;
 }
 
+.page .main .container .content .integration .right .frameMobile {
+  display: none;
+}
+
 .page .main .container .content .integration .left p {
   color: rgba(255, 255, 255, 0.6);
   font-family: 'Mate';
@@ -533,6 +541,10 @@
   font-family: 'Mate';
   font-size: 270%;
   font-weight: 700;
+}
+
+.page .main .container .content .roadmap h2 br {
+  display: none;
 }
 
 .page .main .container .content .roadmap p {
@@ -738,7 +750,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  align-self: center;
   row-gap: 20px;
+  margin-top: 20px;
 }
 
 .page .main .about .content .text h2 {
@@ -1372,8 +1386,8 @@
 
   .page .main .container {
     padding-top: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
     padding-bottom: 20px;
   }
 
@@ -1382,12 +1396,172 @@
     padding-right: 0;
   }
 
-  .page .main .about .content img {
+  .page .main .container .content .generation {
+    grid-template-columns: 1fr;
+    margin-top: 220px;
+  }
+
+  .page .main .container .content .generation .left h2 {
+    font-size: 180%;
+  }
+
+  .page .main .container .content .generation .left h2 br {
+    display: none;
+  }
+
+  .page .main .container .content .generation .imageMobile {
     width: 100%;
+    height: auto;
+    position: relative;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .page .main .container .content .generation .left p {
+    font-size: 90%;
+    line-height: 20px;
+  }
+
+  .page .main .container .content .generation .left .items {
+    grid-template-columns: 1fr;
+  }
+
+  .page .main .container .content .generation .right {
+    display: none;
+  }
+
+  .page .main .container .content .integration {
+    width: calc(100% + 40px);
+    border-radius: 0px;
+    grid-template-columns: 1fr;
+    margin-top: 60px;
+    margin-left: -20px;
+  }
+
+  .page .main .container .content .integration .left {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .page .main .container .content .integration .left h2 {
+    font-size: 180%;
+  }
+
+  .page .main .container .content .integration .left h2 br {
+    display: none;
+  }
+
+  .page .main .container .content .integration .frameMobile {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 511 / 501;
+    position: relative;
+    background-image: url('/pictures/home/integration-mobile.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+    display: block;
+  }
+  
+  .page .main .container .content .integration .frameMobile img {
+    width: 32%;
+    height: auto;
+    position: absolute;
+    image-rendering: pixelated;
+    top: 30%;
+    left: 10%;
+    transform-origin: none;
+  }
+  
+  .page .main .container .content .integration .left p {
+    font-size: 90%;
+    line-height: 20px;
+  }
+
+  .page .main .container .content .integration .left .items {
+    justify-content: center;
+  }
+
+  .page .main .container .content .integration .right {
+    display: none;
+  }
+
+  .page .main .about {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .page .main .about .content {
+    grid-template-columns: 1fr;
+  }
+
+  .page .main .about .content .left .label {
+    margin-bottom: 20px;
+  }
+
+  .page .main .container .about .content img {
+    width: 100%;
+  }
+
+  .page .main .about .content .text h2 {
+    font-size: 150%;
+    line-height: 30px;
+  }
+
+  .page .main .about .content .text h2 span {
+    font-size: 120%;
+  }
+
+  .page .main .container .content .donate .left p {
+    font-size: 90%;
+    line-height: 20px;
+  }
+
+  .page .main .about {
+    margin-top: 20px;
+  }
+
+  .page .main .container .content .roadmap {
+    margin-top: 80px;
+  }
+
+  .page .main .container .content .roadmap .label {
+    justify-content: center;
+    margin-left: -10px;
+  }
+
+  .page .main .container .content .roadmap .center {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .page .main .container .content .roadmap .stages {
     width: 100%;
+  }
+
+  .page .main .container .content .roadmap h2 {
+    font-size: 180%;
+    text-align: center;
+  }
+
+  .page .main .container .content .roadmap h2 br {
+    display: block;
+  }
+  
+  .page .main .container .content .roadmap p {
+    width: 100%;
+    font-size: 90%;
+    line-height: 20px;
+  }
+
+  .page .main .container .content .roadmap .stage .text .title {
+    font-size: 150%;
+  }
+  
+  .page .main .container .content .roadmap .stage .text .description {
+    font-size: 90%;
   }
 
   .page footer .content .surface {
