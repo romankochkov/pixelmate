@@ -59,25 +59,13 @@ export default function Generation() {
 
           <div className={styles.content}>
             <section className={styles.demo}>
-              <div className={styles.left}>
-                <div className={styles.text}>
-                  <h1>Your pixel world starts with<br></br>just one simple description</h1>
-                  <p>Create unique pixel sprites in seconds with our innovative AI tool. Whether you<br></br>are a game developer, an artist or just a pixel-style lover, our technology will<br></br>help you bring your ideas to life - quickly, easily and with incredible quality.</p>
+              <div className={styles.text}>
+                <h1>Your <span>pixel world</span> starts with just<br></br> one simple description</h1>
+                <p>Create unique pixel sprites in seconds with our innovative AI tool. Whether you<br></br>are a game developer, an artist or just a pixel-style lover, our technology will<br></br>help you bring your ideas to life - quickly, easily and with incredible quality.</p>
 
-                  <div className={styles.buttons}>
-                    <div className={styles.trynow} onClick={() => window.location.href = "/generation"}><span>Try Now</span></div>
-                    <div className={styles.jointeam}><span>Join Team</span></div>
-                  </div>
+                <div className={styles.buttons}>
+                  <div className={styles.trynow} onClick={() => window.location.href = "/generation"}><span>Try Now</span></div>
                 </div>
-              </div>
-
-              <div className={styles.right}>
-                <Image
-                  src="/pictures/home/demo.png"
-                  alt="Demo"
-                  width={403}
-                  height={461}
-                  unoptimized />
               </div>
             </section>
 
@@ -234,7 +222,7 @@ export default function Generation() {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M256 32l-74.8 0c-27.1 0-51.3 17.1-60.3 42.6L3.1 407.2C1.1 413 0 419.2 0 425.4C0 455.5 24.5 480 54.6 480L256 480l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 64 201.4 0c30.2 0 54.6-24.5 54.6-54.6c0-6.2-1.1-12.4-3.1-18.2L455.1 74.6C446 49.1 421.9 32 394.8 32L320 32l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64zm64 192l0 64c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32s32 14.3 32 32z" /></svg>
                 <span>ROADMAP</span>
               </div>
-              <h2>Our route:<br/>from idea to reality</h2>
+              <h2>Our route:<br />from idea to reality</h2>
               <p>Here you will see how we intend to innovate and move forward with a carefully crafted plan. We share the steps that will help us stay on the cutting edge of technology and ideas. Join us to see what discoveries await us!</p>
               <div className={styles.center}>
                 <div className={styles.stages}>
