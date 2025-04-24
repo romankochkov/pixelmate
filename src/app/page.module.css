@@ -206,7 +206,7 @@
   bottom: 0;
   transform: translateX(-50%);
   image-rendering: pixelated;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .page .main .container .content .generation {
