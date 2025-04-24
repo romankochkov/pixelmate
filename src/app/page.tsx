@@ -67,6 +67,12 @@ export default function Generation() {
                   <div className={styles.trynow} onClick={() => window.location.href = "/generation"}><span>Try Now</span></div>
                 </div>
               </div>
+              <Image
+                src="/pictures/home/demo.png"
+                alt="Demo"
+                width={200}
+                height={100}
+                unoptimized />
             </section>
 
             <section className={styles.generation}>
@@ -440,7 +446,7 @@ export default function Generation() {
             </section>
           </div>
         </div>
-      </main>
+      </main >
       <footer>
         <div className={styles.content}>
           <div className={styles.surface}>
@@ -511,6 +517,6 @@ export default function Generation() {
           <div className={styles.copyrightMobile}>© 2023 Pixelmate. All rights reserved.</div>
         </div>
       </footer>
-    </div>
+    </div >
   );
 }
