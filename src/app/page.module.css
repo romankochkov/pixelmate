@@ -928,6 +928,10 @@
   color: #ffffff;
 }
 
+.page .main .container .content .donate .left .items .itemMobile {
+  display: none;
+}
+
 .page .main .container .content .donate .left .message {
   position: relative;
   margin-top: 20px;
@@ -1538,6 +1542,64 @@
   
   .page .main .container .content .roadmap .stage .text .description {
     font-size: 90%;
+  }
+
+  .page .main .container .content .donate {
+    width: calc(100% + 40px);
+    border-radius: 0;
+    grid-template-columns: 1fr;
+    padding-left: 30px;
+    padding-right: 30px;
+    margin-top: 80px;
+    margin-left: -20px;
+  }
+
+  .page .main .container .content .donate .left h2 {
+    font-size: 180%;
+  }
+
+  .page .main .container .content .donate .left p {
+    font-size: 90%;
+    line-height: 20px;
+  }
+
+  .page .main .container .content .donate .left .items {
+    flex-wrap: wrap;
+    row-gap: 15px;
+  }
+
+  .page .main .container .content .donate .left .items .custom {
+    width: 100%;
+  }
+
+  .page .main .container .content .donate .left .items .item {
+    width: calc(100% / 3 - 7px);
+  }
+
+  .page .main .container .content .donate .left .items .itemMobile {
+    display: flex;
+  }
+
+  .page .main .container .content .donate .left .buttons {
+    flex-direction: column;
+    align-items: center;
+    row-gap: 15px;
+  }
+
+  .page .main .container .content .donate .left .buttons .button {
+    width: 280px;
+  }
+
+  .page .main .container .content .donate .left .buttons .empty {
+    display: none;
+  }
+
+  .page .main .container .content .donate .right {
+    display: none;
+  }
+
+  .page footer {
+    margin-top: 80px;
   }
 
   .page footer .content .surface {

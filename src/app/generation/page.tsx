@@ -1310,7 +1310,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {isGenerated && (
+                {isGenerated && (activeRightPanel !== 'paint') && (
                   <div className={styles.buttons}>
                     <div
                       className={`${styles.background} ${isBackgroundRemoved ? styles.active : ''}`}

@@ -396,6 +396,12 @@ export default function Generation() {
                         ${value}
                       </div>
                     ))}
+                    <div
+                      key={200}
+                      className={`${styles.item} ${styles.itemMobile} ${activeItem === 200 ? styles.active : ''}`}
+                      onClick={() => handleFixedAmountClick(200)}>
+                      ${200}
+                    </div>
                   </div>
                   <div className={styles.message}>
                     <textarea placeholder="Leave your wish here (optional)"></textarea>
