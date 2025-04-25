@@ -87,6 +87,7 @@
   justify-content: center;
   margin-right: 1px;
   cursor: pointer;
+  transition: 0.1s ease;
 }
 
 .page .main .container .nav .buttons .signup span {
@@ -94,6 +95,14 @@
   font-family: 'Mate';
   font-size: 16px;
   font-weight: 600;
+}
+
+.page .main .container .nav .buttons .signup:hover span {
+  color: #3586FF;
+}
+
+.page .main .container .nav .buttons .signupMobile {
+  display: none;
 }
 
 .page .main .container .nav .buttons .getstarted {
@@ -106,6 +115,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  user-select: none;
   transition: 0.1s ease;
 }
 
@@ -202,11 +212,10 @@
   width: 360px;
   height: auto;
   position: absolute;
-  left: 50%;
+  left: 35%;
   bottom: 0;
   transform: translateX(-50%);
   image-rendering: pixelated;
-  opacity: 0.7;
 }
 
 .page .main .container .content .generation {
@@ -1365,10 +1374,78 @@
   }
 
   .page .main .container {
-    padding-top: 10px;
+    padding-top: 0px;
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 20px;
+  }
+
+  .page .main .container .nav {
+    width: calc(100% + 40px);
+    background-color: #0f1432;
+    border-bottom: 2px solid #13193b;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    margin-left: -20px;
+  }
+
+  .page .main .container .nav .logo {
+    width: auto;
+    height: 40px;
+    position: relative;
+    display: inline-flex;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .page .main .container .nav .logo img {
+    width: 26px;
+    height: 26px;
+    margin-right: 6px;
+  }
+
+  .page .main .container .nav .logo span {
+    font-size: 22px;
+    line-height: 38px;
+  }
+
+  .page .main .container .nav .buttons .signup {
+    display: none;
+  }
+
+  .page .main .container .nav .buttons .signupMobile {
+    width: 34px;
+    height: 34px;
+    position: relative;
+    background-color: #3586FF;
+    border-radius: 5px;
+    display: flex;
+    align-self: center;
+    margin-left: 8px;
+    user-select: none;
+  }
+
+  .page .main .container .nav .buttons .signupMobile span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 22px;
+    font-variation-settings: 'wght' 500;
+  }
+
+  .page .main .container .nav .buttons .getstarted {
+    width: 110px;
+    height: 34px;
+    align-self: center;
+  }
+
+  .page .main .container .nav .buttons .getstarted span {
+    font-size: 13.5px;
+    margin-top: 2px;
   }
 
   .page .main .container .content {
@@ -1461,7 +1538,7 @@
     margin-top: 20px;
     display: block;
   }
-  
+
   .page .main .container .content .integration .frameMobile img {
     width: 32%;
     height: auto;
@@ -1471,7 +1548,7 @@
     left: 10%;
     transform-origin: none;
   }
-  
+
   .page .main .container .content .integration .left p {
     font-size: 90%;
     line-height: 20px;
@@ -1546,7 +1623,7 @@
   .page .main .container .content .roadmap h2 br {
     display: block;
   }
-  
+
   .page .main .container .content .roadmap p {
     width: 100%;
     font-size: 90%;
@@ -1556,7 +1633,7 @@
   .page .main .container .content .roadmap .stage .text .title {
     font-size: 150%;
   }
-  
+
   .page .main .container .content .roadmap .stage .text .description {
     font-size: 90%;
   }
