@@ -377,7 +377,7 @@ export default function Home() {
 
   const fetchPopularPrompts = async () => {
     try {
-      const response = await fetch(`https://pixelmate.club/api/popular-prompts`, {
+      const response = await fetch(`https://pixelmate.club/api/generation/popular-prompts`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -415,7 +415,7 @@ export default function Home() {
   const fetchRandomPrompt = async (spriteType: string) => {
     console.log('Отправка запроса на случайный промпт...', spriteType);
     try {
-      const response = await fetch(`https://pixelmate.club/api/random-prompt?spriteType=${encodeURIComponent(spriteType)}`, {
+      const response = await fetch(`https://pixelmate.club/api/generation/random-prompt?spriteType=${encodeURIComponent(spriteType)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -474,7 +474,7 @@ export default function Home() {
 
   const fetchQueueStatus = async () => {
     try {
-      const response = await fetch(`https://pixelmate.club/api/status`, {
+      const response = await fetch(`https://pixelmate.club/api/generation/status`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -527,8 +527,8 @@ export default function Home() {
 
   const getApiUrl = () => {
     return selectedModel === 'PixelCore'
-      ? `https://pixelmate.club/api/generation/pixelcore`
-      : `https://pixelmate.club/api/generation/pixeldiffusion`;
+      ? `https://pixelmate.club/api/generation/model/pixelcore`
+      : `https://pixelmate.club/api/generation/model/pixeldiffusion`;
   };
 
   const handleInput = () => {
@@ -570,7 +570,7 @@ export default function Home() {
 
   const fetchQueuePosition = async (taskId: string) => {
     try {
-      const response = await fetch(`https://pixelmate.club/api/task/${taskId}/position`, {
+      const response = await fetch(`https://pixelmate.club/api/generation/task/${taskId}/position`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -617,7 +617,7 @@ export default function Home() {
     setIsGenerated(false);
 
     try {
-      const translateResponse = await fetch(`https://pixelmate.club/api/translate-prompt?prompt=${encodeURIComponent(description)}`, {
+      const translateResponse = await fetch(`https://pixelmate.club/api/generation/translate-prompt?prompt=${encodeURIComponent(description)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -641,7 +641,7 @@ export default function Home() {
 
       if (isSmartMode) {
         try {
-          const smartResponse = await fetch(`https://pixelmate.club/api/smart-prompt?prompt=${encodeURIComponent(translatedPrompt)}`, {
+          const smartResponse = await fetch(`https://pixelmate.club/api/generation/smart-prompt?prompt=${encodeURIComponent(translatedPrompt)}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -705,7 +705,7 @@ export default function Home() {
       const checkStatus = setInterval(async () => {
         try {
           console.log(`Опрос статуса задачи ${taskId}...`);
-          const statusResponse = await fetch(`https://pixelmate.club/api/task/${taskId}`);
+          const statusResponse = await fetch(`https://pixelmate.club/api/generation/task/${taskId}`);
           if (!statusResponse.ok) {
             throw new Error(`Ошибка при запросе статуса: ${statusResponse.status}`);
           }
