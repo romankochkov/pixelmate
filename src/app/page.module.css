@@ -1526,10 +1526,10 @@
     display: none;
   }
 
-  .page .main .container .content .integration .frameMobile {
+  .page .main .container .content .integration .left .frameMobile {
     width: 100%;
     height: auto;
-    aspect-ratio: 511 / 501;
+    aspect-ratio: 400 / 392;
     position: relative;
     background-image: url('/pictures/home/integration-mobile.svg');
     background-size: cover;
