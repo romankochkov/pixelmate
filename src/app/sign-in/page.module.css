@@ -125,6 +125,23 @@
     outline: none;
 }
 
+.error {
+    width: 350px;
+    height: auto;
+    background-color: rgba(118, 44, 44, 0.3);
+    color: #A83434;
+    font-family: 'Mate';
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 5px;
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 16px;
+    margin-top: -15px;
+    margin-bottom: 30px;
+}
+
 .page .main .container .left .content .recovery {
     color: #3586FF;
     font-family: 'Mate';
@@ -265,6 +282,10 @@
     }
 
     .page .main .container .left .content input[type="password"] {
+        width: 100%;
+    }
+
+    .error {
         width: 100%;
     }
 

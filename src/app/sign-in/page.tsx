@@ -55,7 +55,6 @@ export default function SignIn() {
                         <div className={styles.content}>
                             <p className={styles.title}>Hi, there 👋</p>
 
-                            {error && <p className={styles.error}>{error}</p>}
                             <form ref={formRef} onSubmit={handleSignIn}>
                                 <p className={styles.label}>Email address</p>
                                 <input
@@ -73,6 +72,8 @@ export default function SignIn() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
+
+                                {error && <p className={styles.error}>{error}</p>}
 
                                 <p className={styles.recovery}>Forgot password</p>
                                 <div className={styles.button} onClick={() => formRef.current?.requestSubmit()}><span>Continue</span></div>
