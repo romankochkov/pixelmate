@@ -52,7 +52,7 @@ export default function Home() {
   ];
   const [queueMessage, setQueueMessage] = useState(queueMessages[0]);
   const [isStrictMode, setIsStrictMode] = useState(false);
-  const [isSmartMode, setIsSmartMode] = useState(false);
+  const [isSmartMode, setIsSmartMode] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageDataRef = useRef<ImageData | null>(null);
