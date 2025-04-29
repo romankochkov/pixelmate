@@ -398,6 +398,12 @@ export default function Home() {
                       <div className={styles.icon}><span>$</span></div>
                       <input type="number" min="1" max="100000" value={amount} step="1" onChange={handleCustomAmountChange} />
                     </div>
+                    <div
+                      key={3}
+                      className={`${styles.item} ${styles.itemMobile} ${activeItem === 3 ? styles.active : ''}`}
+                      onClick={() => handleFixedAmountClick(3)}>
+                      ${3}
+                    </div>
                     {fixedAmounts.map((value) => (
                       <div
                         key={value}
@@ -406,12 +412,6 @@ export default function Home() {
                         ${value}
                       </div>
                     ))}
-                    <div
-                      key={200}
-                      className={`${styles.item} ${styles.itemMobile} ${activeItem === 200 ? styles.active : ''}`}
-                      onClick={() => handleFixedAmountClick(200)}>
-                      ${200}
-                    </div>
                   </div>
                   <div className={styles.message}>
                     <textarea placeholder="Leave your wish here (optional)"></textarea>
@@ -422,7 +422,7 @@ export default function Home() {
                         volunteer_activism
                       </span>
                     </div>
-                    <div className={styles.kickstarter}>Support us on
+                    <div className={styles.kickstarter}>Coming soon to
                       <Image
                         src="/pictures/home/kickstarter.svg"
                         alt="Kickstarter"
