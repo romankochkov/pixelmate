@@ -28,6 +28,18 @@ export default function RootLayout({
         <meta property="og:title" content="AI Pixel Sprite Generation | Pixelmate" />
         <meta property="og:description" content="Create stunning pixel art sprites effortlessly with our AI-powered generator. Whether you're designing characters, creatures, or objects, our tool delivers high-quality, pixel-style sprites in seconds. Customize your creations with advanced options and bring your game or project to life with unique pixel-perfect designs." />
         <meta property="og:image" content="/pictures/meta.png" />
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q8JSP4E268"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Q8JSP4E268');
+            `,
+          }}
+        />
       </head>
       <body>
         {children}
