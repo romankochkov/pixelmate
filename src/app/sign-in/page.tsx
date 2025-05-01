@@ -16,6 +16,35 @@ export default function SignIn() {
     const formRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
+        const checkToken = async () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                try {
+                    const response = await fetch('/api/auth/check', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const data = await response.json();
+                    if (data.isAuthorized) {
+                        router.push('/generation');
+                    } else {
+                        localStorage.removeItem('authToken');
+                    }
+                } catch (error) {
+                    console.error('Token check error:', error);
+                    localStorage.removeItem('authToken');
+                }
+            }
+        };
+
+        checkToken();
+    }, [router]);
+
+    useEffect(() => {
         return () => {
             const script = document.querySelector(
                 `script[src="https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}"]`
@@ -34,7 +63,6 @@ export default function SignIn() {
             e.preventDefault();
 
             try {
-                // Проверяем наличие window и grecaptcha
                 if (typeof window === 'undefined' || !window.grecaptcha) {
                     throw new Error('reCAPTCHA не загружен');
                 }
@@ -60,8 +88,8 @@ export default function SignIn() {
 
                 const data = await res.json();
                 if (res.ok) {
-                    localStorage.setItem('token', data.token);
-                    router.push('/');
+                    localStorage.setItem('authToken', data.token);
+                    router.push('/generation');
                 } else {
                     setError(data.error);
                 }

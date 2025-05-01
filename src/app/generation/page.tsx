@@ -7,7 +7,7 @@ import { useRef, useState, useEffect, StrictMode } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const server = process.env.NEXT_PUBLIC_SERVER?.toString();
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -41,6 +41,7 @@ export default function Home() {
   const [isBackgroundRemoved, setIsBackgroundRemoved] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+  const [isAuthRequestOpen, setIsAuthRequestOpen] = useState(false);
   const [colorPalette, setColorPalette] = useState<string[]>(Array(18).fill('#21233D'));
   const [queuePosition, setQueuePosition] = useState(null);
   const [queueTotal, setQueueTotal] = useState(null);
@@ -63,6 +64,64 @@ export default function Home() {
 
   const [editHistory, setEditHistory] = useState<string[]>(['/pictures/sprite.png']);
   const [editHistoryIndex, setEditHistoryIndex] = useState(0);
+
+  useEffect(() => {
+    const checkAuthorization = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          setIsAuthorized(false);
+          return;
+        }
+
+        const response = await fetch('/api/auth/check', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        setIsAuthorized(data.isAuthorized || false);
+      } catch (error) {
+        console.error('Authorization check error:', error);
+        setIsAuthorized(false);
+      }
+    };
+
+    checkAuthorization();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          console.error('Failed to logout on server:', await response.json());
+        }
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('authToken');
+      setIsAuthorized(false);
+      setIsUserDropdownOpen(false);
+      router.push('/sign-in');
+    }
+  };
+
+  const handleSignIn = async () => {
+    router.push('/sign-in');
+  }
 
   const initializeCanvas = (src: string) => {
     const canvas = canvasRef.current;
@@ -1150,12 +1209,14 @@ export default function Home() {
                     </span>
                     <div className={styles.text}>Donate</div>
                   </div>
+                  {isAuthorized ? (
                   <div className={styles.button}>
                     <span className="material-symbols-rounded">
                       settings
                     </span>
                     <div className={styles.text}>Settings</div>
                   </div>
+                  ) : undefined}
                   <div className={styles.button}>
                     <span className="material-symbols-rounded">
                       forum
@@ -1163,12 +1224,17 @@ export default function Home() {
                     <div className={styles.text}>Help & FAQ</div>
                   </div>
                   <div className={styles.separator}></div>
-                  <div className={styles.button}>
-                    <span className="material-symbols-rounded">
-                      exit_to_app
-                    </span>
-                    <div className={styles.text}>Log out</div>
-                  </div>
+                  {isAuthorized ? (
+                    <div className={styles.button} onClick={handleLogout}>
+                      <span className="material-symbols-rounded">exit_to_app</span>
+                      <div className={styles.text}>Log out</div>
+                    </div>
+                  ) : (
+                    <div className={styles.button} onClick={handleSignIn}>
+                      <span className="material-symbols-rounded">exit_to_app</span>
+                      <div className={styles.text}>Sign in</div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1383,10 +1449,10 @@ export default function Home() {
                   </div>
                   <div
                     className={`${styles.tab} ${generationMode === 'advanced' ? styles.active : ''}`}
-                    onClick={() => handleModeChange('advanced')} style={{ paddingLeft: '10px' }}>
+                    onClick={() => (isAuthorized ? handleModeChange('advanced') : setIsAuthRequestOpen(true))}>
                     Multiple
                     <span className="material-symbols-rounded">
-                      lock
+                      {isAuthorized ? '' : 'lock'}
                     </span>
                   </div>
                 </div>
@@ -1729,9 +1795,25 @@ export default function Home() {
           </div>
           */}
 
+          <div className={styles.authRequest} style={{ display: isAuthRequestOpen ? 'block' : 'none' }}>
+            <span className={`material-symbols-rounded ${styles.close}`} onClick={() => setIsAuthRequestOpen(false)}>close</span>
+
+            <p className={styles.title}>Several sprites at once<span>Log In</span></p>
+            <p className={styles.subtitle}>Please sign in to use this feature</p>
+            <p className={styles.description}>Discover the full power of our platform! Sign in today to unlock a world of exclusive features, advanced tools, and personalized options designed to enhance your experience. Whether you're looking to customize your journey or access premium functionalities, authorization is your key to everything we offer. Don’t wait—log in now and start exploring the complete range of possibilities!</p>
+
+            <div className={styles.choose}>
+              <Image src="/pictures/generation/auth-request.png" alt="Image" width={100} height={60} unoptimized />
+              <Image src="/pictures/generation/auth-request2.png" alt="Image" width={100} height={60} style={{ filter: 'saturate(25%) brightness(0.8)' }} unoptimized />
+              <div className={styles.activeButton} onClick={handleSignIn}><span>Sign in</span></div>
+              <div className={styles.button} onClick={() => setIsAuthRequestOpen(false)}><span>Discover without account</span></div>
+            </div>
+          </div>
+
           <div className={styles.fade} style={{ display: isModelDropdownOpen ? 'block' : 'none' }} onClick={() => setIsDropdownOpen(false)}></div>
           <div className={styles.fade} style={{ display: isUserDropdownOpen ? 'block' : 'none' }} onClick={() => setIsUserDropdownOpen(false)}></div>
           <div className={styles.fade} style={{ display: isNotificationDropdownOpen ? 'block' : 'none' }} onClick={() => setIsNotificationDropdownOpen(false)}></div>
+          <div className={styles.fade} style={{ display: isAuthRequestOpen ? 'block' : 'none' }} onClick={() => setIsAuthRequestOpen(false)}></div>
         </div>
       </main>
     </div>

@@ -17,6 +17,35 @@ export default function SignUp() {
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
+    const checkToken = async () => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        try {
+          const response = await fetch('/api/auth/check', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const data = await response.json();
+          if (data.isAuthorized) {
+            router.push('/generation');
+          } else {
+            localStorage.removeItem('authToken');
+          }
+        } catch (error) {
+          console.error('Token check error:', error);
+          localStorage.removeItem('authToken');
+        }
+      }
+    };
+
+    checkToken();
+  }, [router]);
+
+  useEffect(() => {
     return () => {
       const script = document.querySelector(
         `script[src="https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}"]`
@@ -66,7 +95,7 @@ export default function SignUp() {
 
         const data = await res.json();
         if (res.ok) {
-          localStorage.setItem('token', data.token);
+          localStorage.setItem('authToken', data.token);
           router.push('/');
         } else {
           setError(data.error);
@@ -93,7 +122,7 @@ export default function SignUp() {
       <div className={styles.page}>
         <main className={styles.main}>
           <div className={styles.container}>
-            <div className={styles.logo} onClick={() => router.push('/')}>
+            <div className={styles.logo} onClick={() => router.push('/generation')}>
               <Image src="/pictures/logo.svg" alt="Logo" width={30} height={30} />{' '}
               <span>pixelmate</span>
             </div>
