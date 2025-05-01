@@ -12,6 +12,7 @@ export default function SignIn() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
 
@@ -62,6 +63,9 @@ export default function SignIn() {
         async (e: React.FormEvent) => {
             e.preventDefault();
 
+            if (loading) return;
+            setLoading(true);
+
             try {
                 if (typeof window === 'undefined' || !window.grecaptcha) {
                     throw new Error('reCAPTCHA не загружен');
@@ -96,6 +100,8 @@ export default function SignIn() {
             } catch (err) {
                 setError('reCAPTCHA error or server error');
             }
+
+            setLoading(false);
         },
         [email, password, router]
     );
@@ -146,9 +152,8 @@ export default function SignIn() {
                                     <p className={styles.recovery}>Forgot password</p>
                                     <div
                                         className={styles.button}
-                                        onClick={() => formRef.current?.requestSubmit()}
-                                    >
-                                        <span>Continue</span>
+                                        onClick={() => formRef.current?.requestSubmit()}>
+                                        {loading ? <span className={`material-symbols-rounded ${styles.loader}`}>progress_activity</span> : <span className={styles.text}>Continue</span>}
                                     </div>
                                 </form>
                                 <div className={styles.google} onClick={handleGoogleSignIn}>

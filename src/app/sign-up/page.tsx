@@ -13,6 +13,7 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -63,13 +64,15 @@ export default function SignUp() {
     async (e: React.FormEvent) => {
       e.preventDefault();
 
+      if (loading) return;
+      setLoading(true);
+
       if (password !== confirmPassword) {
         setError('The passwords do not match');
-        return;
+        return setLoading(false);
       }
 
       try {
-        // Проверяем наличие window и grecaptcha
         if (typeof window === 'undefined' || !window.grecaptcha) {
           throw new Error('reCAPTCHA не загружен');
         }
@@ -103,6 +106,8 @@ export default function SignUp() {
       } catch (err) {
         setError('reCAPTCHA error or server error');
       }
+
+      setLoading(false);
     },
     [email, password, confirmPassword, router]
   );
@@ -162,9 +167,8 @@ export default function SignUp() {
 
                   <div
                     className={styles.button}
-                    onClick={() => formRef.current?.requestSubmit()}
-                  >
-                    <span>Continue</span>
+                    onClick={() => formRef.current?.requestSubmit()}>
+                    {loading ? <span className={`material-symbols-rounded ${styles.loader}`}>progress_activity</span> : <span className={styles.text}>Continue</span>}
                   </div>
                 </form>
                 <div className={styles.google} onClick={handleGoogleSignUp}>

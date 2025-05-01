@@ -167,12 +167,19 @@
     transition: 0.1s ease;
 }
 
-.page .main .container .left .content .button span {
+.page .main .container .left .content .button .text {
     color: #fff;
     font-family: 'Mate';
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 2.5px;
+}
+
+.page .main .container .left .content .button .loader {
+    color: #fff;
+    font-size: 22px;
+    font-variation-settings: 'FILL' 1, 'wght' 600;
+    animation: spin 0.8s linear infinite;
 }
 
 .page .main .container .left .content .button:hover {
@@ -255,6 +262,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 576px) {
