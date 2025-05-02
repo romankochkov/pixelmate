@@ -1150,6 +1150,7 @@ export default function Home() {
                 <span className="material-symbols-rounded">keyboard_arrow_down</span>
               </div>
             </div>
+            
             <div className={styles.menu}>
               <div className={styles.notification} style={{ zIndex: isNotificationDropdownOpen ? '3' : '2' }}>
                 <div
@@ -1210,12 +1211,12 @@ export default function Home() {
                     <div className={styles.text}>Donate</div>
                   </div>
                   {isAuthorized ? (
-                  <div className={styles.button}>
-                    <span className="material-symbols-rounded">
-                      settings
-                    </span>
-                    <div className={styles.text}>Settings</div>
-                  </div>
+                    <div className={styles.button}>
+                      <span className="material-symbols-rounded">
+                        settings
+                      </span>
+                      <div className={styles.text}>Settings</div>
+                    </div>
                   ) : undefined}
                   <div className={styles.button}>
                     <span className="material-symbols-rounded">
@@ -1322,6 +1323,7 @@ export default function Home() {
               </div>
 
               <div className={styles.center}>
+              <div className={styles.caution}>Generation technology is still being tested. Use advanced generation settings for greater accuracy.</div>
                 <div className={styles.picture}>
                   {isLoading && (
                     <>
