@@ -866,6 +866,7 @@
 
 .page .main .container .content .base .center .prompt {
   width: 100%;
+  position: relative;
   background-color: #171E46;
   border-radius: 6px;
   padding-top: 10px;
@@ -941,6 +942,56 @@
   color: #fff;
   font-size: 20px;
   font-variation-settings: 'FILL' 1;
+}
+
+.page .main .container .content .base .center .prompt .suggestions {
+  width: 100%;
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+}
+
+.page .main .container .content .base .center .prompt .suggestions .label {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Mate';
+  font-size: 12px;
+  font-weight: 700;
+  border-right: 1px solid rgba(255, 255, 255, 0.8);
+  padding-right: 10px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.page .main .container .content .base .center .prompt .suggestions .items {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page .main .container .content .base .center .prompt .suggestions .items .item {
+  background-color: #121836;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: 'Mate';
+  font-size: 11px;
+  font-weight: 400;
+  padding-top: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+  display: flex;
+  cursor: pointer;
+  user-select: none;
+}
+
+.page .main .container .content .base .center .prompt .suggestions .items .item:hover {
+  background-color: #171E46;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .page .main .container .content .base .right {

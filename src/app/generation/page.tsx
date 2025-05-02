@@ -46,6 +46,7 @@ export default function Home() {
   const [queuePosition, setQueuePosition] = useState(null);
   const [queueTotal, setQueueTotal] = useState(null);
   const [hasError, setHasError] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const queueMessages = [
     "Already close to a<br />masterpiece...",
     "Wait for your<br />portion of magic...",
@@ -122,6 +123,7 @@ export default function Home() {
   const handleSignIn = async () => {
     router.push('/sign-in');
   }
+
 
   const initializeCanvas = (src: string) => {
     const canvas = canvasRef.current;
@@ -590,6 +592,30 @@ export default function Home() {
       : `https://pixelmate.club/api/generation/model/pixeldiffusion`;
   };
 
+  const fetchSuggestions = async (prompt: string) => {
+    try {
+      const response = await fetch(`https://pixelmate.club/api/generation/suggestions?prompt=${encodeURIComponent(prompt)}&spriteType=${encodeURIComponent(spriteType.replace('oid', ''))}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка при получении предложений');
+      }
+
+      const data = await response.json();
+      const suggestionsArray = Array.isArray(data) ? data : data.suggestions || [];
+      setSuggestions(suggestionsArray.slice(0, 2));
+    } catch (error) {
+      console.error('Ошибка при загрузке предложений:', error);
+      setSuggestions([]);
+    }
+  };
+
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleInput = () => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -606,7 +632,28 @@ export default function Home() {
     } else {
       textarea.rows = 3;
     }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    const prompt = textarea.value.trim();
+    if (prompt) {
+      typingTimeoutRef.current = setTimeout(() => {
+        fetchSuggestions(prompt);
+      }, 1000);
+    } else {
+      setSuggestions([]);
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleRandomClick = async () => {
     if (isLoading || isTypingAnimation) return;
@@ -1150,7 +1197,7 @@ export default function Home() {
                 <span className="material-symbols-rounded">keyboard_arrow_down</span>
               </div>
             </div>
-            
+
             <div className={styles.menu}>
               <div className={styles.notification} style={{ zIndex: isNotificationDropdownOpen ? '3' : '2' }}>
                 <div
@@ -1323,7 +1370,7 @@ export default function Home() {
               </div>
 
               <div className={styles.center}>
-              <div className={styles.caution}>Generation technology is still being tested. Use advanced generation settings for greater accuracy.</div>
+                <div className={styles.caution}>Generation technology is still being tested. Use advanced generation settings for greater accuracy.</div>
                 <div className={styles.picture}>
                   {isLoading && (
                     <>
@@ -1375,6 +1422,25 @@ export default function Home() {
                     onClick={handleRandomClick}
                     style={{ pointerEvents: isLoading || isTypingAnimation ? 'none' : 'auto' }}>
                     <span className="material-symbols-rounded">ifl</span>
+                  </div>
+
+                  <div className={styles.suggestions}>
+                  <div className={styles.label} style={suggestions.length === 0 ? { display: 'none' } : {}}>BETA</div>
+                    <div className={styles.items}>
+                      {suggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          className={styles.item}
+                          onClick={() => {
+                            if (textareaRef.current) {
+                              textareaRef.current.value = suggestion;
+                              handleInput();
+                            }
+                          }}>
+                          {suggestion}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
