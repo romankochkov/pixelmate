@@ -562,6 +562,7 @@ export default function Home() {
 
       setQueueStatus(newStatus);
       setHasError(false);
+      setShowToast(false)
     } catch (error) {
       console.error('Ошибка при получении статуса:', error);
       setQueueStatus([0, 0, 0, 0, 0]);
