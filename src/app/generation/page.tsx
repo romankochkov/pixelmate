@@ -1601,7 +1601,7 @@ export default function Home() {
                   <div
                     className={`${styles.tab} ${spriteOrientation === 'vertical' ? styles.active : ''}`}
                     onClick={() => handleSpriteOrientationChange('vertical')}>
-                    Vectical
+                    Vertical
                   </div>
                 </div>
 
