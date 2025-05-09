@@ -1457,14 +1457,7 @@ export default function Home() {
                     <div className={styles.items}>
                       {savedImages.map((src, index) => (
                         <div key={index} className={styles.item}>
-                          <Image
-                            src={src}
-                            alt={`Sprite ${index}`}
-                            width={128}
-                            height={128}
-                            unoptimized
-                            style={{ opacity: isLoading ? '0.1' : '0.7' }}
-                          />
+                          <img src={src} alt={`Sprite ${index}`} />
                         </div>
                       ))}
                     </div>
