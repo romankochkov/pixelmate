@@ -646,6 +646,50 @@
   text-align: center;
 }
 
+.page .main .container .content .base .left .tabs .saved .items {
+  max-height: 500px;
+  padding-right: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  overflow-y: auto;
+  opacity: 1;
+}
+
+.page .main .container .content .base .left .tabs .saved .items::-webkit-scrollbar {
+  width: 4px;
+  background-color: transparent;
+}
+
+.page .main .container .content .base .left .tabs .saved .items::-webkit-scrollbar-thumb {
+  background-color: #171E46;
+  border-radius: 40px;
+}
+
+.page .main .container .content .base .left .tabs .saved .items .item {
+  max-width: 64px;
+  max-height: 64px;
+  background-color: #171E46;
+  border: 3px solid #171E46;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.page .main .container .content .base .left .tabs .saved .items .item:hover {
+  border: 3px solid #3586FF;
+  border-radius: 4px;
+}
+
+.page .main .container .content .base .left .tabs .saved .items .item img {
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1 / 1;
+  image-rendering: pixelated;
+  display: flex;
+  transition: 0.1s;
+}
+
 .page .main .container .content .base .center {
   height: 100%;
   position: relative;

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import "./../fonts.scss";
-import { useRef, useState, useEffect, StrictMode } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
@@ -21,6 +21,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
+  const [savedImages, setSavedImages] = useState<string[]>([]);
   const [activeRightPanel, setActiveRightPanel] = useState<string | null>(null);
   const [spriteType, setSpriteType] = useState('humanoid');
   const [spriteOrientation, setSpriteOrientation] = useState('normal');
@@ -37,7 +38,7 @@ export default function Home() {
   const [showToast, setShowToast] = useState(false);
   const [popularPrompts, setPopularPrompts] = useState<string[]>([]);
   const [isGenerated, setIsGenerated] = useState(false);
-  const [originalImage, setOriginalImage] = useState<string | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null); 1
   const [isBackgroundRemoved, setIsBackgroundRemoved] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
@@ -83,11 +84,29 @@ export default function Home() {
           },
         });
 
+        if (!response.ok) {
+          throw new Error('Authorization check failed');
+        }
+
         const data = await response.json();
-        setIsAuthorized(data.isAuthorized || false);
+        if (data.isAuthorized) {
+          setIsAuthorized(true);
+          if (data.userId) {
+            localStorage.setItem('userId', data.userId.toString());
+            console.log('Stored userId in localStorage:', localStorage.getItem('userId'));
+            // Fetch saved images when authorized
+            await fetchSavedImages();
+          } else {
+            console.warn('userId not returned from /api/auth/check');
+          }
+        } else {
+          setIsAuthorized(false);
+          localStorage.removeItem('userId');
+        }
       } catch (error) {
         console.error('Authorization check error:', error);
         setIsAuthorized(false);
+        localStorage.removeItem('userId');
       }
     };
 
@@ -114,6 +133,8 @@ export default function Home() {
       console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('authToken');
+      localStorage.removeItem('userId');
+
       setIsAuthorized(false);
       setIsUserDropdownOpen(false);
       router.push('/sign-in');
@@ -472,6 +493,30 @@ export default function Home() {
   useEffect(() => {
     fetchPopularPrompts();
   }, []);
+
+  const fetchSavedImages = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      const response = await fetch('/api/saved/get', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch saved images');
+      }
+
+      const data = await response.json();
+      setSavedImages(data.images || []);
+    } catch (error) {
+      console.error('Error fetching saved images:', error);
+    }
+  };
 
   const fetchRandomPrompt = async (spriteType: string) => {
     console.log('Отправка запроса на случайный промпт...', spriteType);
@@ -875,6 +920,53 @@ export default function Home() {
       setIsGenerated(false);
       setQueuePosition(null);
       setQueueTotal(null);
+    }
+  };
+
+  const handleSaveImage = async () => {
+    if (!isGenerated || !imageSrc) return;
+
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert('User ID not found. Please sign in again.');
+      return;
+    }
+
+    try {
+      const response = await fetch(imageSrc);
+      if (!response.ok) {
+        throw new Error('Failed to fetch image');
+      }
+      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append('image', blob, `${crypto.randomUUID()}.png`);
+      formData.append('owner', userId);
+
+      const saveResponse = await fetch('/api/saved/add', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
+        },
+        body: formData,
+      });
+
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        throw new Error(errorData.error || 'Failed to save image');
+      }
+
+      const data = await saveResponse.json();
+      console.log('Image saved successfully:', data);
+
+      // Assuming the API returns the uuid in the response (e.g., data.data.uuid)
+      const newImageUuid = data.data.uuid; // Adjust based on your API response structure
+      const newImageUrl = `/media/saved/${newImageUuid}.png`;
+
+      // Update the savedImages state by appending the new image URL
+      setSavedImages((prev) => [...prev, newImageUrl]);
+    } catch (error) {
+      console.error('Error saving image:', error);
+      alert((error as Error).message || 'Failed to save the image. Please try again.');
     }
   };
 
@@ -1295,22 +1387,21 @@ export default function Home() {
                 <div className={styles.menu}>
                   <div
                     className={`${styles.popular} ${activeTab === 'popular' ? styles.active : ''}`}
-                    onClick={() => handleTabClick('popular')}
-                  >
+                    onClick={() => handleTabClick('popular')}>
                     <span className="material-symbols-rounded">trending_up</span>
                   </div>
                   <div
                     className={`${styles.history} ${activeTab === 'history' ? styles.active : ''}`}
-                    onClick={() => handleTabClick('history')}
-                  >
+                    onClick={() => handleTabClick('history')}>
                     <span className="material-symbols-rounded">history</span>
                   </div>
-                  <div
-                    className={`${styles.saved} ${activeTab === 'saved' ? styles.active : ''}`}
-                    onClick={() => handleTabClick('saved')}
-                  >
-                    <span className="material-symbols-rounded">bookmark</span>
-                  </div>
+                  {isAuthorized && (savedImages.length > 0) && (
+                    <div
+                      className={`${styles.saved} ${activeTab === 'saved' ? styles.active : ''}`}
+                      onClick={() => handleTabClick('saved')}>
+                      <span className="material-symbols-rounded">bookmark</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className={styles.tabs}>
@@ -1349,7 +1440,7 @@ export default function Home() {
                             key={index}>
                             <Image
                               src={src}
-                              alt={`History Sprite ${history.length - index}`}
+                              alt={`Sprite ${history.length - index}`}
                               width={128}
                               height={128}
                               unoptimized
@@ -1364,7 +1455,18 @@ export default function Home() {
                   <div className={styles.saved} style={{ display: activeTab === 'saved' ? 'block' : 'none' }}>
                     <div className={styles.title}>Saved</div>
                     <div className={styles.items}>
-                      <div className={styles.item}>...</div>
+                      {savedImages.map((src, index) => (
+                        <div key={index} className={styles.item}>
+                          <Image
+                            src={src}
+                            alt={`Sprite ${index}`}
+                            width={128}
+                            height={128}
+                            unoptimized
+                            style={{ opacity: isLoading ? '0.1' : '0.7' }}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -1426,7 +1528,7 @@ export default function Home() {
                   </div>
 
                   <div className={styles.suggestions}>
-                  <div className={styles.label} style={suggestions.length === 0 ? { display: 'none' } : {}}>BETA</div>
+                    <div className={styles.label} style={suggestions.length === 0 ? { display: 'none' } : {}}>BETA</div>
                     <div className={styles.items}>
                       {suggestions.map((suggestion, index) => (
                         <div
@@ -1448,12 +1550,13 @@ export default function Home() {
                 {isGenerated && (activeRightPanel !== 'paint') && (
                   <div className={styles.buttons}>
                     <div
-                      className={`${styles.background} ${isBackgroundRemoved ? styles.active : ''}`}
-                      onClick={handleBackgroundToggle}
-                    >
+                      className={`${styles.background} ${isGenerated ? styles.downloadAnimate : ''} ${isBackgroundRemoved ? styles.active : ''}`}
+                      onClick={handleBackgroundToggle}>
                       <span className="material-symbols-rounded">background_replace</span>
                     </div>
-                    <div className={styles.bookmark}>
+                    <div
+                      className={`${styles.bookmark} ${isGenerated ? styles.downloadAnimate : ''}`}
+                      onClick={handleSaveImage}>
                       <span className="material-symbols-rounded">bookmark</span>
                     </div>
                     <div
